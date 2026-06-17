@@ -42,7 +42,36 @@
     "products": [
       {
         "product": "Proximos",
-        "href": "proximos/why-does-proximos-exist"
+        "href": "proximos/why-does-proximos-exist",
+        "tabs": [
+          {
+            "tab": "Documentation",
+            "groups": [
+              {
+                "group": "Overview",
+                "pages": [
+                  "proximos/why-does-proximos-exist",
+                  "proximos/getting-started",
+                  "proximos/logic-overview",
+                  "proximos/what-about-ddm",
+                  "proximos/about-the-engine",
+                  "proximos/licensing-overview"
+                ]
+              },
+              {
+                "group": "Deployment & Administration",
+                "pages": [
+                  "proximos/mdm-deployment",
+                  "proximos/removal",
+                  "proximos/settings-overview",
+                  "proximos/default-settings-reference",
+                  "proximos/command-line-overview",
+                  "proximos/extra-mdm-scripts"
+                ]
+              }
+            ]
+          }
+        ]
       }
     ]
   },
