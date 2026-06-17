@@ -244,6 +244,25 @@ Enable **Skip Software Update Validation** in Main Settings to bypass this gate 
 
 ## Handling a Corrupted or Misconfigured Settings File
 
+<Frame>
+  <img
+    src="/images/Settings-Error-Light.png"
+    alt="Settings Error Dark"
+    title="Settings Error Dark"
+    lightAlt="Settings Error Dark"
+    darkAlt="Settings Error Dark"
+    className="dark:hidden"
+  />
+  <img
+    src="/images/Settings-Error-Dark.png"
+    alt="Settings Error Dark"
+    title="Settings Error Dark"
+    lightAlt="Settings Error Dark"
+    darkAlt="Settings Error Dark"
+    className="hidden dark:block"
+  />
+</Frame>
+
 Every Minor Engine and Major Engine run begins by decoding the active settings plist. If that plist contains a syntax error or an invalid value — for example from manual hand-editing, a botched find-and-replace, or a corrupted file transfer — Proximos cannot safely proceed with the engine logic described above.
 
 When this happens, Proximos does not crash or silently fail. Instead, it displays a caution icon in the menu bar along with user-facing warning text indicating that the configuration could not be read, and the engine remains inoperable — no notifications are sent and no enforcement runs — until the problem is resolved.
