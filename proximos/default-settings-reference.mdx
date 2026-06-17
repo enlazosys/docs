@@ -1,0 +1,430 @@
+---
+title: "Default Settings Reference"
+description: "Every default Proximos setting and the reasoning behind its chosen value."
+---
+
+When Proximos launches for the first time on a Mac with no settings plist present anywhere on the system, it writes a default settings file at `~/Library/Preferences/com.enlazo.proximos.settings.plist`. These defaults are chosen to be safe, functional, and compliant out of the box for most IT environments without requiring any configuration. This page documents every default value and the reasoning behind each decision.
+
+Before deploying to your fleet, review these defaults and adjust any values that don't match your organization's policies. When you're ready, export your configuration from **Settings → Export Settings** and deploy it via MDM or package installer to lock in your settings across all Macs.
+
+---
+
+## Main Settings Defaults
+
+### License Key
+
+**Default:** `""` (empty)
+
+No license key is pre-configured. On first launch Proximos opens the **Proximos License Manager** window to prompt for a key or guide the user through purchase. For MDM deployments, the license key should be included in your exported settings plist so it is present immediately on every managed Mac without requiring any user action.
+
+---
+
+### Enforce Update On Day
+
+**Default:** `5`
+
+Five days after Apple's official macOS release date is the default enforcement deadline. This is intentionally tight — it reflects the reality that most macOS updates contain important security patches, and prompt installation is the baseline expectation in well-managed environments.
+
+Five days is also broadly compliant with common cybersecurity insurance and regulatory frameworks. Some cyber liability insurers and compliance programs stipulate that critical OS patches must be applied within **48 hours (2 days)** of release. If your organization operates under such a policy, lower this value to `2`. For organizations without specific patch timeline requirements who want a gentler introduction for users, values of 7–14 days are reasonable.
+
+> **Compliance note:** If your cyber insurance policy, SOC 2 controls, or other framework stipulates a specific patch window, set this value accordingly and document it as part of your security program. Proximos makes it straightforward to enforce a 2-day, 5-day, or 14-day window with equal ease.
+
+---
+
+### Daily Run Time
+
+**Default:** `"10:00"` (10:00 AM)
+
+10:00 AM is the default scheduled time for the daily update check. This time was chosen deliberately — it is late enough that most users are settled into their workday and have had time to get their morning tasks underway, but early enough that any notification or Nudge enforcement has most of the working day ahead of it for the user to act on.
+
+Running too early (e.g., 6:00 AM) risks firing before users are at their desks or before their Macs have woken from sleep. Running too late (e.g., 4:00 PM or later) leaves users little working time to take action before they disconnect for the day.
+
+Common customization choices include 9:00 AM for organizations that want checks at the start of the business day, or a staggered time like 10:30 AM to avoid scheduled check-in peaks in larger fleets. If you are using the **System Headless Launch Agent**, this value is baked into the launch agent PKG at export time — set your preferred time before generating the PKG.
+
+---
+
+### Enable Enrollment Grace Period
+
+**Default:** `true`
+
+The enrollment grace period is enabled by default. Disabling it would mean that the very first time Proximos runs on a brand-new Mac, it could immediately begin counting down toward enforcement if an update is available — potentially within hours of unboxing. That is not a good experience for a new employee on their first day.
+
+With the grace period enabled, new Macs are given a buffer before enforcement begins, during which users see a friendly welcome notification explaining that update management has started and how many days they have before updates will be required.
+
+---
+
+### Enrollment Grace Period Days
+
+**Default:** `1`
+
+One day is the default grace period. This gives a new employee enough time to get through their first day of setup — signing into accounts, configuring their environment, attending onboarding — without being immediately pressured by update enforcement.
+
+One day is deliberately minimal. The grace period is not intended as an extended exemption from updates; it is a brief courtesy window. Most organizations deploying Proximos want enforcement to begin promptly. Adjust this value to match your onboarding timeline — common choices are `7` days for a one-week onboarding buffer or `14` days for organizations with longer equipment setup processes.
+
+> **Note:** The enrollment date is recorded on the first Proximos run and never resets. The grace period clock starts at first launch, not at MDM enrollment.
+
+---
+
+### Enable Proximos Launch Agent
+
+**Default:** `false`
+
+The user-level Proximos Launch Agent (which keeps the app running persistently in the menu bar) is off by default. This gives IT administrators control over whether and how Proximos runs persistently, rather than automatically installing a launch agent on every Mac at first launch.
+
+**However, Enlazo Systems recommends enabling persistent operation for most deployments.** There are two supported approaches:
+
+- **Enable this setting** in your exported settings plist to have Proximos install and manage a user-level launch agent (`~/Library/LaunchAgents/com.enlazo.proximos.plist`) automatically.
+- **Deploy the System Launch Agent PKG** from **Settings → Extras → Export Standard .pkg** via your MDM. The system-level agent at `/Library/LaunchAgents/com.enlazo.proximos.plist` provides persistent operation for all users on the Mac. When the system agent is detected, this checkbox is automatically locked in the Settings UI to prevent conflicts.
+
+Without persistent operation, Proximos only runs when the user manually opens it or when the Headless Launch Agent fires once daily — meaning users will not see the menu bar icon, real-time status, or be able to manually trigger checks during the day.
+
+---
+
+### Enable Nudge Launch Agent
+
+**Default:** `false`
+
+The Nudge LaunchAgent — which runs Nudge on a repeating schedule after enforcement begins — is off by default. In this mode, Proximos launches Nudge directly when enforcement is triggered during the daily check. Nudge runs for that session; if the user restarts or Proximos does not run again until the next scheduled check, Nudge will not reappear until then.
+
+Enabling this setting installs a Nudge launch agent (`~/Library/LaunchAgents/com.github.macadmins.Nudge.plist`) for the user that relaunches Nudge on the `Nudge Nag Interval` schedule (default: every 15 minutes) until the user completes the update. This is more persistent enforcement — Nudge will reappear after restarts and throughout the day.
+
+This is disabled by default because the Nudge LaunchAgent requires the **Proximos PPPC Profile** to be deployed for the `launchctl` calls to function correctly. Enable it once your PPPC profile is deployed across your fleet, or enforce it via a PPPC profile requirement. The note in the Settings UI describes it as "More secure Nudge enforcement" — the LaunchAgent approach is harder for users to work around than a single direct launch.
+
+---
+
+### Disable Notifications
+
+**Default:** `false`
+
+Notifications are enabled by default. The countdown notification banners Proximos sends at 30, 25, 20, 15, 10, 5, 4, 3, 2, and 1 days before enforcement are a core part of the user-facing experience — they give users advance notice and the opportunity to update voluntarily before Nudge enforcement begins. Disabling them removes that advance warning and means users will only encounter enforcement when Nudge appears on enforcement day.
+
+Leave this `false` unless you have a specific reason to suppress notifications, such as managing enrollment notifications separately via a Custom Notification Script, or operating in an environment where notification popups are not appropriate.
+
+---
+
+### Disable Nudge Integration
+
+**Default:** `false`
+
+Nudge enforcement is enabled by default. Nudge is the primary enforcement mechanism in Proximos — disabling it removes the core compliance lever and should only be done when an alternative enforcement path (a Custom Past Due Command that calls an MDM action, custom script, or `startosinstall`) is in place. Without Nudge and without a Custom Past Due Command, past-due Macs receive no enforcement at all.
+
+---
+
+### Skip Software Update Validation
+
+**Default:** `false`
+
+The `softwareupdate --list` pre-flight check before Nudge launches is enabled by default. This is a safety mechanism that prevents Nudge from harassing users about an update that isn't actually available to their specific Mac — for example, when a point release has limited hardware availability or when enterprise GDMF deferrals are in place. Disabling it is only necessary when `softwareupdate` itself is consistently returning errors on your Macs (diagnosed via the `softwareupdateError` Extension Attribute) and you want Nudge to proceed regardless.
+
+---
+
+### Custom Pending Update Command
+
+**Default:** `""` (empty, disabled)
+
+No custom command runs during the countdown period by default. This is an optional power-user feature for organizations that want to run additional scripts, send telemetry, or trigger MDM inventory updates alongside the standard Proximos notification. Leave empty if you do not need custom behavior during the countdown.
+
+---
+
+### Custom Past Due Command
+
+**Default:** `""` (empty, disabled)
+
+No custom command runs when a Mac is past the enforcement deadline by default. Leave empty unless you need a custom action — such as triggering a Jamf Pro policy, sending an alert to your help desk system, or running `startosinstall` — to fire in addition to Nudge when a Mac is past due.
+
+---
+
+### Custom Engine URL
+
+**Default:** `nil` (uses Proximos Engine endpoints)
+
+No custom engine URL is set. The Proximos Engine at `https://proximosappengine.enlazosystems.com/` is used with automatic fallback to the secondary AWS endpoint. This should only be changed if directed by Enlazo Systems support.
+
+---
+
+## Branding Settings Defaults
+
+### Custom IBM Notifier Location
+
+**Default:** `nil` (uses bundled notifier)
+
+Proximos ships with a bundled copy of IBM Notifier for user-facing alert dialogs. If your organization wants notification banners and alerts to display your own logo and branding instead of the Proximos default, you can build a rebranded IBM Notifier and point this setting to it. Left as `nil` by default so Proximos works out of the box without any additional assets.
+
+---
+
+### Custom Nudge Logo Location
+
+**Default:** `nil` (uses bundled Logo.png)
+
+The Proximos logo is used as the icon displayed inside the Nudge enforcement window by default. Set this to a custom PNG, JPEG, or ICNS at a consistent path on your managed Macs (e.g., `/usr/local/images/logo.png`) to display your organization's logo in Nudge instead.
+
+---
+
+### Custom Notification Icon Location
+
+**Default:** `nil` (no custom icon)
+
+No custom notification icon is set by default. Notification banners will display without a custom image badge. Set this to a custom image path to add your organization's icon to enrollment and countdown notification banners.
+
+---
+
+### Custom Enrollment Message
+
+**Default:** `nil` (auto-generated)
+
+When left as `nil`, Proximos generates a default enrollment message using the configured Company Name: _"Welcome! \[Company Name\] has enrolled your Mac into macOS update management. Any available updates will begin installing in \[X\] days..."_ Set a custom message here if you want to control the exact wording of the enrollment notification.
+
+---
+
+## Major Settings Defaults
+
+### Enable Major Mode
+
+**Default:** `false`
+
+Major Mode is off by default. Most organizations run Proximos in minor update mode — enforcing point releases within the current macOS major version — and only enable Major Mode when they are ready to push a full macOS upgrade across their fleet. Enabling it before you have configured and tested the major upgrade workflow could inadvertently trigger upgrade enforcement. Enable this deliberately when you have set a `majorVersionToEnforce` and `enforceMajorReleaseDate` that are appropriate for your fleet.
+
+---
+
+### Major Version to Enforce
+
+**Default:** `26`
+
+The default major version is set to `26` (macOS Tahoe), which is the current major macOS release at the time of this writing. Update this value to match whatever major macOS version you are driving your fleet toward.
+
+---
+
+### Enforce Major Release Date
+
+**Default:** Today's date (at the time the default plist is written)
+
+The enforcement date defaults to the current date when the default plist is first written. This is intentionally a placeholder — it means Major Mode would begin enforcing immediately if enabled without changing this date. **Set this to your actual target compliance date before enabling Major Mode.** A typical approach is to set this 30–90 days in the future to give users a meaningful countdown window before the upgrade is mandatory.
+
+---
+
+### Enable Nudge Action Upgrade Button
+
+**Default:** `false`
+
+The Nudge action button (which can point to a Jamf Self Service or Munki URL instead of launching the installer directly) is off by default. Leave this `false` if you want Nudge to point users to the downloaded installer on their Mac directly. Enable it if your major upgrade workflow is managed through Self Service or Munki and you want the Nudge action button to open that workflow instead.
+
+---
+
+### Nudge Action URL
+
+**Default:** `"jamfselfservice://example or munki://updates"`
+
+The default value is a placeholder showing the two common URL formats — a Jamf Self Service deep link or a Munki updates link. This value has no effect unless **Enable Nudge Action Upgrade Button** is also enabled. Replace this with your actual Self Service or Munki URL before enabling that setting.
+
+---
+
+### Use startosinstall
+
+**Default:** `false`
+
+The `startosinstall` silent upgrade path is off by default. This is a powerful advanced feature — it can initiate a fully silent macOS upgrade without user interaction — and is therefore disabled until explicitly configured. Enable it only in conjunction with the **Proximos startosinstall Major Enforce.sh** MDM script, which handles the credential requirements and workflow.
+
+---
+
+## Nudge Optional Features Defaults
+
+### Acceptable Application Bundle IDs
+
+**Default:** `com.apple.systempreferences`, `com.tinyspeck.slackmacgap`, `com.microsoft.teams`, `us.zoom.xos`
+
+These four applications are whitelisted from Nudge's focus-blocking and aggressive mode behavior by default. The reasoning:
+
+- **System Preferences / System Settings (`com.apple.systempreferences`)** — A user actively in System Settings is likely already installing the update. Blocking them here would be counterproductive.
+- **Slack (`com.tinyspeck.slackmacgap`)** — The most widely deployed team communication tool. Interrupting a Slack call or active work conversation with Nudge's aggressive mode causes significant friction and support burden.
+- **Zoom (`us.zoom.xos`)** — Active video calls should never be disrupted by enforcement. A user in a meeting cannot be expected to install an update mid-call.
+- **Microsoft Teams (`com.microsoft.teams`)** — Same rationale as Zoom and Slack.
+
+Add any other business-critical applications your organization uses — video conferencing tools, telephony apps, or any app where an unexpected focus loss would cause real problems for users.
+
+---
+
+### Acceptable Camera Usage
+
+**Default:** `true`
+
+When `true`, Nudge will not interrupt or aggressively cover applications when the Mac's camera is actively in use. This is a practical safeguard — if a user is on a video call that Nudge did not detect via the acceptable app list, the camera-usage check provides a secondary layer of protection against enforcement disrupting live video. This is strongly recommended to keep enabled.
+
+---
+
+### Acceptable Screen Sharing Usage
+
+**Default:** `true`
+
+Same rationale as camera usage. If a user is actively screen-sharing with another person, Nudge will not aggressively interrupt. This prevents the embarrassing scenario of Nudge appearing full-screen while a user is presenting to a customer or colleague.
+
+---
+
+### Acceptable Assertion Usage
+
+**Default:** `false`
+
+When `false`, Nudge does not check for general system assertions (such as those raised by media playback or downloads in progress) before applying aggressive enforcement. Most organizations leave this `false` because the camera and screen sharing checks above already cover the most common legitimate use cases. Enable it if you find enforcement triggering during other specific workflows that raise system assertions.
+
+---
+
+### Aggressive User Experience
+
+**Default:** `false`
+
+The aggressive user experience — where Nudge's window blocks access to other applications and prevents normal work — is off by default. The default experience lets users acknowledge Nudge, return to their work, and come back to update at their convenience (within the Nudge nag interval). Enabling the aggressive experience significantly increases user frustration and support tickets, and should only be used for Macs that are severely out of date or in high-security environments where compliance is non-negotiable.
+
+---
+
+### Aggressive User Full Screen Experience
+
+**Default:** `true`
+
+Even without the full aggressive experience enabled, Nudge defaults to a full-screen overlay when the user is in a full-screen application. This prevents users from simply entering full-screen mode in an app to avoid seeing Nudge. It is a reasonable middle ground that maintains awareness without blocking normal workflows.
+
+---
+
+### Allow Movable Window During Aggressive User Experience
+
+**Default:** `true`
+
+When the aggressive user experience is enabled, allowing the user to reposition the Nudge window is enabled by default. This is a small quality-of-life concession — a user who needs to read content behind the Nudge window can move it, even if they cannot dismiss it. Disabling this makes Nudge completely immovable when aggressive mode is active.
+
+---
+
+### Attempt to Block Application Launches
+
+**Default:** `true`
+
+Nudge's application blocking — which prevents apps on the **Blocked Application Bundle IDs** list from launching during enforcement — is enabled by default. Without this, a determined user could open Terminal, kill the Nudge process, and delay enforcement indefinitely. The default blocked list covers the most common tools for doing exactly that.
+
+---
+
+### Blocked Application Bundle IDs
+
+**Default:** `com.apple.Terminal`, `com.googlecode.iterm2`, `com.apple.ActivityMonitor`, `com.1password.1password`, `com.lastpass.LastPass`, `com.apple.keychainaccess`, `com.apple.Passwords`
+
+These applications are blocked during Nudge enforcement by default. The rationale:
+
+- **Terminal (`com.apple.Terminal`) and iTerm2 (`com.googlecode.iterm2`)** — The most direct way to kill the Nudge process from the command line. Blocking terminal emulators during enforcement prevents the most common technical workaround.
+- **Activity Monitor (`com.apple.ActivityMonitor`)** — Can be used to force-quit the Nudge process with a few clicks. Blocked for the same reason.
+- **1Password (`com.1password.1password`), LastPass (`com.lastpass.LastPass`), Keychain Access (`com.apple.keychainaccess`), Passwords (`com.apple.Passwords`)** — Credential managers and keychain tools. These are blocked for two reasons: as a security measure, since a Mac that is out of compliance with OS updates should not be granting access to stored credentials when the device may have unpatched vulnerabilities, and as additional encouragement — a user who can't get to their saved passwords has one more good reason to simply complete the update rather than work around it.
+
+Review this list for your environment and add or remove apps as appropriate. In some organizations, blocking 1Password may cause significant user friction — weigh the security tradeoff against your user population.
+
+---
+
+### Terminate Applications on Launch
+
+**Default:** `true`
+
+When a blocked application is detected launching during enforcement, Nudge terminates it immediately rather than just preventing it from receiving focus. This is `true` by default to make the block effective — a launch-and-immediately-terminate behavior is more reliable than focus prevention alone.
+
+---
+
+### Enforce Minor Updates
+
+**Default:** `true`
+
+Nudge is configured to enforce minor updates by default. This is the core purpose of minor mode — ensuring Macs are updated to the latest point release within their current major version. This should remain `true` in virtually all deployments.
+
+---
+
+## Nudge OS Version Requirements Defaults
+
+### Action Button Text
+
+**Default:** `"Update"`
+
+The text on the primary action button inside the Nudge window defaults to "Update". This is clear, direct, and universally understood. Change it if your organization uses different terminology or if you want to reference a specific workflow (e.g., "Update via Self Service" or "Install Now").
+
+---
+
+### Targeted OS Versions Rule
+
+**Default:** `"default"`
+
+The `"default"` rule targets all macOS versions — meaning the Nudge configuration applies to all Macs regardless of their current macOS version. This is the correct setting for most organizations. Change this only if you have a complex fleet with version-specific enforcement requirements, in which case refer to the [Nudge wiki](https://github.com/macadmins/nudge/wiki/osVersionRequirements) for the rule syntax.
+
+---
+
+## Nudge Update Elements Defaults
+
+### Minor Update Window Text
+
+The default Nudge window content for minor updates is:
+
+**Main Header:** _"Your Mac requires updates!"_ **Sub Header:** _"A friendly reminder from \[Company Name\]"_ **Body Text:** _"A fully up-to-date device is required to ensure that IT can accurately protect your device. To begin the update, simply click on the Update button and follow the provided steps. If you experience any issues during the update, please reach out to your support desk."_
+
+These defaults are chosen to be factually accurate, non-alarmist, and actionable. They explain the why (device protection), the how (click Update), and the what-if (contact support). Customize these in **Settings → Nudge Settings → Update Elements** to match your organization's tone, terminology, and support contact details.
+
+---
+
+### Major Upgrade Window Text
+
+**Main Header:** _"A macOS Upgrade is now required."_ **Sub Header:** _"A friendly reminder from \[Company Name\]"_ **Body Text:** _"Your Mac now requires an upgrade to a newer macOS release. A fully up-to-date device is required to ensure that IT can accurately protect your device. To begin the update, simply click on the Update button and follow the provided steps. If you experience any issues during the update, please reach out to your support desk."_
+
+The major upgrade text is deliberately distinct from the minor update text — it makes clear that this is a full OS upgrade, not a simple patch. Customize in **Settings → Major Settings → Nudge Major Update Elements**.
+
+---
+
+## Nudge User Experience Defaults
+
+### Elapsed Refresh Cycle
+
+**Default:** `1800` seconds (30 minutes)
+
+After Nudge opens, it rechecks compliance every 30 minutes while it is running. If the user has completed the update, Nudge closes itself. If the update is still pending, Nudge remains open (or relaunches on its nag interval schedule). 30 minutes is a practical middle ground — long enough that Nudge is not constantly hammering the system, short enough that a completed update is acknowledged reasonably quickly.
+
+---
+
+### No Timers
+
+**Default:** `false`
+
+Nudge's built-in deferral and reminder timers are enabled by default. These timers govern how Nudge tracks and surfaces the remaining deferral count and other time-based UI elements. Disabling them removes this tracking. Leave `false` for normal operation.
+
+---
+
+### Nudge Nag Interval
+
+**Default:** `900` seconds (15 minutes)
+
+When the Nudge LaunchAgent is enabled, it relaunches Nudge every 15 minutes until the user completes the update. 15 minutes is persistent enough to be noticeable and create a meaningful prompt to act, while not being so aggressive that users feel the Mac is unusable. If you want more forceful nagging for severely overdue Macs, consider lowering this to 300 seconds (5 minutes) — but be aware this will generate significant user frustration and support volume.
+
+---
+
+## Nudge User Interface Defaults
+
+### Screenshot Paths (Dark and Light)
+
+**Default:** `""` (none)
+
+No custom screenshots are shown in the Nudge window by default. The screenshot panel in Nudge is designed to show a visual guide to help users find Software Update. If you want to provide custom screenshots (e.g., annotated screenshots of your organization's specific update workflow), set these paths to image files deployed at a consistent location on all managed Macs.
+
+---
+
+### Show Deferral Count
+
+**Default:** `false`
+
+The deferral counter — which shows users how many times they have dismissed Nudge — is hidden by default. Surfacing this number can increase anxiety for users who have been deferring, and in some cases gives users a game-like goal to avoid (i.e., gaming the deferral count). Hide it unless your policy requires users to see it as an accountability measure.
+
+---
+
+### Simple Mode
+
+**Default:** `false`
+
+Nudge's full-featured UI is used by default. Simple Mode removes some of the informational content and presents a more stripped-down window. Leave `false` for the full experience, which includes more context about why the update is required and how to complete it.
+
+---
+
+### Single Quit Button
+
+**Default:** `false`
+
+By default, Nudge presents its standard UI with the appropriate deferral and close controls. A single quit button simplifies the UI to one close option. Leave `false` for the standard experience.
+
+---
+
+_Documentation version: 1.2 | Proximos by Enlazo Systems LLC | [enlazosystems.com](https://enlazosystems.com) | [support@enlazosystems.com](mailto:support@enlazosystems.com) | docs: [docs.enlazosystems.com](https://docs.enlazosystems.com)_

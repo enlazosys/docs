@@ -1,0 +1,177 @@
+---
+title: "Command Line Overview"
+description: "Every Proximos CLI command, its purpose, and its corresponding MDM script."
+---
+
+Proximos includes a full command line interface (CLI) for use in MDM scripts, remote management, and automation. All flags operate silently — no windows or UI are shown. Each CLI command is also available as a ready-to-deploy shell script in the Standard Scripts folder of the [Extra MDM Scripts](/proximos/extra-mdm-scripts) bundle, exported from **Settings → Extras → Export MDM Scripts**. Invoke by calling the Proximos binary directly:
+
+```text
+/Applications/Utilities/Proximos.app/Contents/MacOS/Proximos [option]
+```
+
+Most CLI commands require **root privileges** and must be run with `sudo` or via your MDM as root.
+
+---
+
+## `--check-for-updates`
+
+**Purpose:** Runs the standard Proximos update check (minor or major engine, depending on settings) without opening the menu bar app. This is the command used by the Headless Launch Agent.
+
+**Requires root:** No.
+
+- Loads settings from the highest-priority plist available (Managed Preferences → System Library → User Library)
+- Evaluates the enrollment grace period for the logged-in console user
+- If past the grace period, contacts the Proximos Engine API
+- Computes the enforcement countdown and takes the appropriate action (notification or Nudge)
+- Writes updated status to the runtime plist
+- Exits when complete
+
+**Usage:**
+
+```bash
+/Applications/Utilities/Proximos.app/Contents/MacOS/Proximos --check-for-updates
+```
+
+**Notes:**
+
+- If no user is logged in, the check exits cleanly with an informational message
+- If the device is offline, the check exits without changing the license status or LastRun timestamp, preserving the current state until connectivity is restored
+- **MDM script:** This command is used by both the System Launch Agent and System Headless Launch Agent scripts. See [Deploy Proximos System Headless Launch Agent.sh](/proximos/extra-mdm-scripts#deploy-proximos-system-headless-launch-agentsh) for scheduled daily headless execution.
+
+---
+
+## `--clear-nudge`
+
+**Purpose:** Kills any running Nudge process for the currently logged-in console user and unloads the Nudge LaunchAgent from their launchd session. Use via MDM to immediately grant a user enforcement relief.
+
+**Requires root:** Yes — run as root or via `sudo`.
+
+**Usage:**
+
+```bash
+sudo /Applications/Utilities/Proximos.app/Contents/MacOS/Proximos --clear-nudge
+```
+
+**Behavior:**
+
+- Resolves the real console user via `SCDynamicStoreCopyConsoleUser` (works correctly even when running as root via sudo)
+- Runs `killall -u [username] Nudge` to terminate the running Nudge process
+- Runs `launchctl asuser [uid] launchctl unload -w [NudgeLaunchAgentPath]` to unload the Nudge launch agent
+- Prints confirmation of each step to stdout
+
+**Notes:**
+
+- Nudge resumes on the next Proximos scheduled run or the next time the Nudge LaunchAgent fires, if still past the enforcement deadline
+- The **Clear Nudge** button in **Settings → Help** performs the same action for the current user without requiring root
+- **MDM script:** [`proximos --clear-nudge.sh`](/proximos/extra-mdm-scripts#proximos---clear-nudgesh)
+
+---
+
+## `--disable-updates-until <date>`
+
+**Purpose:** Suppresses all scheduled and launch-time Proximos update runs until midnight of the specified date. After the date passes, the suppression key is automatically removed from the runtime plist and normal scheduling resumes. Manual **Check for macOS Updates** from the menu bar is never affected. After setting, a "Disabled" notice appears in the user's Proximos menu bar item showing the date.
+
+**Requires root:** Yes.
+
+**Accepted date formats:**
+
+```text
+M/d/yy       → 7/2/26
+MM/dd/yy     → 07/02/26
+M/d/yyyy     → 7/2/2026
+MM/dd/yyyy   → 07/02/2026
+```
+
+**Usage:**
+
+```bash
+sudo /Applications/Utilities/Proximos.app/Contents/MacOS/Proximos --disable-updates-until 7/2/26
+```
+
+**Use cases:**
+
+- Suppress enforcement during a major corporate event, product launch, or IT freeze window
+- Provide temporary relief to a user or group of users via MDM without clearing their grace period
+
+**MDM script:** [`proximos --disable-updates-until.sh`](/proximos/extra-mdm-scripts#proximos---disable-updates-untilsh)
+
+---
+
+## `--resume-updates`
+
+**Purpose:** Immediately re-enables scheduled and launch-time update runs by removing the suppression key set by `--disable-updates-until`. Only necessary if you need to cancel the suppression before its configured end date.
+
+**Requires root:** No.
+
+**Usage:**
+
+```bash
+sudo /Applications/Utilities/Proximos.app/Contents/MacOS/Proximos --resume-updates
+```
+
+**MDM script:** [`proximos --resume-updates.sh`](/proximos/extra-mdm-scripts#proximos---resume-updatessh)
+
+---
+
+## `--skip-macosversion <version>`
+
+**Purpose:** Suppresses notifications and Nudge enforcement for a specific macOS version. When the Proximos Engine returns a target version matching the skipped version, all daily and launch-time enforcement for that version is silently suppressed. Manual **Check for macOS Updates** still runs normally. The Proximos Engine still contacts the API and writes the current target version to the plist — so menu bar status and MDM extension attributes remain accurate.
+
+**Requires root:** Yes.
+
+**Version format:** Must be `X.Y` or `X.Y.Z` where the minor version (Y) is non-zero. Bare major versions and `.0` variants are rejected because they will never match an Apple-issued update version string.
+
+**Valid examples:**
+
+```text
+14.1
+15.3.2
+26.1
+26.5.1
+```
+
+**Invalid examples (rejected):**
+
+```text
+14       → bare integer, rejected
+26.0     → bare major disguised as version, rejected
+27       → bare integer, rejected
+```
+
+**Usage:**
+
+```bash
+sudo /Applications/Utilities/Proximos.app/Contents/MacOS/Proximos --skip-macosversion 15.3.2
+```
+
+**MDM script:** [`proximos --skip-macosversion.sh`](/proximos/extra-mdm-scripts#proximos---skip-macosversionsh)
+
+---
+
+## `--remove-skip`
+
+**Purpose:** Removes the version skip set by `--skip-macosversion`, immediately re-enabling scheduled and launch-time enforcement. Safe to call when no skip is active — exits cleanly with an informational message.
+
+**Requires root:** Yes.
+
+**Usage:**
+
+```bash
+sudo /Applications/Utilities/Proximos.app/Contents/MacOS/Proximos --remove-skip
+```
+
+**MDM script:** [`proximos --remove-skip.sh`](/proximos/extra-mdm-scripts#proximos---remove-skipsh)
+
+---
+
+## `--help` / `-h`
+
+**Purpose:** Prints a full usage summary of all available CLI options to stdout and exits.
+
+**Requires root:** No.
+
+**Usage:**
+
+```bash
+/Applications/Utilities/Proximos.app/Contents/MacOS/Proximos --help
+```

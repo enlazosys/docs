@@ -1,0 +1,283 @@
+---
+title: "MDM Deployment"
+description: "Deploying Proximos, its settings, PPPC profile, and launch agents via Jamf Pro, Mosyle, Addigy, and JumpCloud."
+---
+
+Proximos is built for MDM-managed environments. The recommended deployment flow is:
+
+1. Configure Proximos on an IT admin or test Mac.
+2. Export the settings plist from **Settings → Export Settings → Export as .plist…** (or as a `.pkg`).
+3. Deploy the app and settings plist to managed Macs via your MDM.
+4. Deploy the System Launch Agent or System Headless Launch Agent PKG from **Settings → Extras** for persistent or headless operation.
+5. Deploy the Proximos PPPC Profile from **Settings → Extras → Export Full Profile** for full notification and enforcement functionality.
+
+When a settings file exists at `/Library/Managed Preferences/com.enlazo.proximos.settings.plist` or `/Library/Preferences/com.enlazo.proximos.settings.plist`, Proximos enters **Managed Mode**. In Managed Mode, users cannot access the Settings or License Manager windows, and the Quit menu option is hidden from the menu bar.
+
+---
+
+## Deployment in Jamf Pro
+
+Jamf Pro supports all three Proximos deployment methods for the application, settings, and PPPC profile. The recommended approach for most Jamf Pro environments is the **Installation Script** for the app, a **Configuration Profile** for settings (for full Managed Mode protection), and a **Configuration Profile** for the PPPC profile.
+
+### Deploying the Proximos Application
+
+**Option 1 — Installation Script (recommended):** The `Install or Update Proximos.sh` script downloads the latest Proximos DMG directly from Enlazo Systems, mounts it, copies the app to `/Applications/Utilities/`, and unmounts the DMG. It is safe to run on Macs where Proximos is already installed — it will update to the latest version.
+
+1. In Jamf Pro, go to **Settings → Computer Management → Scripts → \+ New**.
+2. On the **General** tab, give the script a name (e.g., "Install Proximos").
+3. On the **Script** tab, paste the contents of `Install or Update Proximos.sh` from the MDM Scripts bundle.
+4. Click **Save**.
+5. Go to **Computers → Policies → \+ New**.
+6. On the **General** tab, set a display name and configure your preferred trigger (e.g., **Enrollment Complete**, **Recurring Check-in**, or **Self Service**).
+7. Go to the **Scripts** payload, click **Configure**, and add your script.
+8. Go to the **Scope** tab and target the appropriate computers or smart groups.
+9. Click **Save**.
+
+**Option 2 — PKG Deployment:** If you have a Proximos `.pkg` installer provided by Enlazo Systems:
+
+1. Go to **Settings → Computer Management → Packages → \+ New**.
+2. Upload the Proximos `.pkg` file and click **Save**.
+3. Go to **Computers → Policies → \+ New**, add the package via the **Packages** payload, scope it, and save.
+
+> The installation script is generally preferred over the PKG for Proximos because it always pulls the latest version from Enlazo Systems, ensuring your fleet stays current without requiring a new package upload for each Proximos update.
+
+### Deploying Proximos Settings
+
+**Option 1 — Configuration Profile (recommended):** This is the most secure and tamper-resistant approach. The settings are delivered to `/Library/Managed Preferences/` where local admins cannot delete them, ensuring Managed Mode is permanent.
+
+1. Export your configured settings plist from **Settings → Export Settings → Export as .plist…** and save it as `com.enlazo.proximos.settings.plist`.
+2. In Jamf Pro, go to **Computers → Configuration Profiles → \+ New**.
+3. On the **General** tab, give the profile a name (e.g., "Proximos Settings").
+4. Click **Application & Custom Settings** in the left payload list.
+5. Click **\+ Add**, then set **Source** to **Upload**.
+6. Click **Choose File** and select your exported `com.enlazo.proximos.settings.plist` file.
+7. Set the **Preference Domain** to `com.enlazo.proximos.settings`.
+8. Go to the **Scope** tab and target the appropriate computers or smart groups.
+9. Click **Save**.
+
+**Option 2 — Settings PKG:** The `Proximos Settings.pkg` exported from **Settings → Export Settings → Export as .pkg…** installs the plist to `/Library/Preferences/`. Deploy it as a Jamf package via a Policy the same way as the application PKG above.
+
+> Note: A file in `/Library/Preferences/` can be deleted by a local administrator. See the [recommendation above](/proximos/extra-mdm-scripts#deploy-proximos-settingssh) about redeployment at check-in if using this method.
+
+**Option 3 — Settings Script:**
+
+1. Go to **Settings → Computer Management → Scripts → \+ New** and upload `Deploy Proximos Settings.sh` (with your settings values pre-filled).
+2. Deploy via a Policy with your preferred trigger and scope.
+
+### Deploying the Proximos PPPC Profile
+
+The Full PPPC Profile authorizes Proximos, its bundled notifier, and the Nudge LaunchAgent to function with full system permissions. This profile must be deployed for notifications and enforcement to work correctly.
+
+1. In Proximos, go to **Settings → Extras → Proximos PPPC Profiles → Export Full Profile** and save `Proximos PPPC Profile.mobileconfig`.
+2. In Jamf Pro, go to **Computers → Configuration Profiles → \+ New**.
+3. On the **General** tab, give the profile a name (e.g., "Proximos PPPC Profile").
+4. Click **Upload** (in the upper right of the profile editor) and select the `Proximos PPPC Profile.mobileconfig` file. Jamf Pro will parse and import all payloads from the mobileconfig automatically.
+5. Go to the **Scope** tab and target the appropriate computers or smart groups.
+6. Click **Save**.
+
+### Deploying the System Launch Agent
+
+Deploy the Standard or Headless Launch Agent PKG (generated from **Settings → Extras**) as a Jamf package via a Policy, or upload and run the corresponding deployment script. See [About the System Launch Agent](#about-the-system-launch-agent-and-system-headless-launch-agent) for guidance on which to choose.
+
+---
+
+## Deployment in Mosyle
+
+Mosyle supports script-based, package-based, and profile-based deployment for all Proximos components. The recommended approach is the **Installation Script** for the app, a **Custom Profile** for settings, and a **Custom Profile** for the PPPC profile.
+
+### Deploying the Proximos Application
+
+**Option 1 — Custom Command Script (recommended):**
+
+1. In Mosyle, go to **macOS → Custom Commands → \+ Add Command**.
+2. Paste the contents of `Install or Update Proximos.sh` into the command body.
+3. Set your preferred execution frequency (e.g., **Run Once** for initial deployment, or **Run Every Time** to keep Proximos updated).
+4. Assign to the appropriate device groups under **Devices** and click **Save**.
+
+**Option 2 — PKG Deployment:**
+
+1. Go to **macOS → Custom Packages → \+ Add Package**.
+2. Upload the Proximos `.pkg` file.
+3. Assign to the appropriate device groups and configure the installation trigger.
+4. Click **Save**.
+
+### Deploying Proximos Settings
+
+**Option 1 — Custom Profile (recommended):**
+
+1. Export your configured settings from **Settings → Export Settings → Export as .plist…**.
+2. In Mosyle, go to **macOS → Profiles → \+ Add Profile → Custom Profile**.
+3. Upload your exported `com.enlazo.proximos.settings.plist` directly, or paste its XML content into the profile payload field.
+4. Set the **Preference Domain** to `com.enlazo.proximos.settings`.
+5. Assign to device groups and click **Save**.
+
+> Mosyle delivers Custom Profiles to `/Library/Managed Preferences/`, providing full Managed Mode protection that a local admin cannot remove.
+
+**Option 2 — Custom Command Script:**
+
+1. Go to **macOS → Custom Commands → \+ Add Command**.
+2. Paste the contents of `Deploy Proximos Settings.sh` (with your settings values pre-filled) into the command body.
+3. Set **Run As** to **Root** and set frequency to **Run Every Time** to ensure the settings file is always present.
+4. Assign to device groups and click **Save**.
+
+### Deploying the Proximos PPPC Profile
+
+1. In Proximos, go to **Settings → Extras → Export Full Profile** and save `Proximos PPPC Profile.mobileconfig`.
+2. In Mosyle, go to **macOS → Profiles → \+ Add Profile → Custom Profile**.
+3. Upload the `Proximos PPPC Profile.mobileconfig` file. Mosyle will parse the payload automatically.
+4. Assign to device groups and click **Save**.
+
+### Deploying the System Launch Agent
+
+Deploy the Standard or Headless Launch Agent PKG via **macOS → Custom Packages**, or run the corresponding deployment script as a Custom Command with **Run As: Root**. See [About the System Launch Agent](#about-the-system-launch-agent-and-system-headless-launch-agent) for guidance.
+
+---
+
+## Deployment in Addigy
+
+Addigy supports script and package deployment for the Proximos application and settings, and Custom Profile deployment for the PPPC profile. Addigy does not have a feature for deploying a raw application preference `.plist` directly as a Custom Profile the way Jamf Pro's Application & Custom Settings payload does — for Proximos Settings specifically, the file must be deployed as a PKG or a script instead.
+
+### Deploying the Proximos Application
+
+**Smart Software Deployment:**
+
+1. In Addigy, go to **Catalog → Software → \+ New**.
+2. Copy and paste the contents of `Install or Update Proximos.sh` into the **Installation Command** area.
+3. Click **Save**.
+4. Assign the software item to the appropriate Policies.
+
+### Deploying Proximos Settings
+
+Because Addigy cannot deploy a raw `.plist` as a Custom Profile, settings must be pushed as a PKG (via a Smart Software item) or as a script run through a Maintenance Item.
+
+**Option 1 — PKG via Smart Software Item (recommended):**
+
+1. In Proximos, export your configured settings from **Settings → Export Settings → Export as .pkg…** to generate `Proximos Settings.pkg`.
+2. In Addigy, go to **Catalog → Smart Software → \+ Add Software Item** and upload `Proximos Settings.pkg`.
+3. Add the uploaded `Proximos Settings.pkg` file to the **Installation Script** area of the Smart Software item.
+4. While configuring the Software item, go to **Options → Conditions for Install**, enable the **"if app"** checkbox, and set the condition so the Proximos application at `/Applications/Utilities/Proximos` is equal to or greater than version `1.0`. This causes the settings file to be redeployed on every policy check-in.
+5. Assign the Smart Software item to the appropriate policies or device groups.
+
+> **Alternative:** Instead of uploading the PKG, you can copy and paste the contents of the included `Deploy Proximos Settings - Managed Mode.sh` script (customized with your settings values) directly into the **Installation Command** field of the same Smart Software item.
+
+**Option 2 — Script via Maintenance Item:**
+
+1. Go to **Devices → Scripts → Manage → \+ New** and add `Deploy Proximos Settings.sh` (with your settings values pre-filled) as a script, set to run as root.
+2. Go to **Catalog → Maintenance → \+ Add Maintenance Item** and add your saved script as a step.
+3. Set the Maintenance Item to run on a recurring schedule. Since a settings file deployed via PKG or script lands in `/Library/Preferences/` (not `/Library/Managed Preferences/`), it can be deleted by a local administrator — we recommend running the Maintenance Item on every check-in to ensure the file is always present.
+4. Assign the Maintenance Item to the appropriate policies or device groups.
+
+### Deploying the Proximos PPPC Profile
+
+The PPPC profile is a standard Apple `.mobileconfig`, which Addigy's Custom Profile feature does support directly:
+
+1. In Proximos, go to **Settings → Extras → Export Full Profile** and save `Proximos PPPC Profile.mobileconfig`.
+2. In Addigy, go to **Device Settings → New → Custom Profile**.
+3. Click **Select .mobileconfig File** and upload the `Proximos PPPC Profile.mobileconfig` file.
+4. Click **Save**.
+5. Assign the Device Setting to the appropriate Policies.
+
+### Deploying the System Launch Agent
+
+Deploy the Standard or Headless Launch Agent PKG via **Catalog → My Software** (or as a Smart Software item), or run the corresponding deployment script via **Devices → Scripts → Manage**, scheduled through a Maintenance Item if you want it redeployed regularly. See [About the System Launch Agent](#about-the-system-launch-agent-and-system-headless-launch-agent) for guidance.
+
+---
+
+## Deployment in JumpCloud
+
+JumpCloud's PKG hosting feature only accepts a signed `.pkg` that contains an `.app` bundle. The Proximos Settings PKG and the Launch Agent PKGs do not meet this requirement — they install a plist, not an application — and will fail JumpCloud's validation if uploaded as software packages. For this reason, Proximos deployment in JumpCloud is handled entirely through **Device Management → Commands** for the application, settings, and launch agents, with the PPPC profile deployed separately as a Custom Configuration Profile.
+
+### Deploying the Proximos Application
+
+1. In JumpCloud, go to **Device Management → Commands → \+ Command After Agent Install**.
+2. Set the **Command Type** to **Mac**, and set **Run As** to **root**.
+3. Paste the contents of `Install or Update Proximos.sh` into the command body.
+4. Associate the command with your target **Mac Device Group(s)**.
+5. Click the **Save** button.
+
+### Deploying Proximos Settings
+
+1. In JumpCloud, go to **Device Management → Commands → \+ New Command**.
+2. Set the **Command Type** to **Mac**.
+3. Paste the contents of `Deploy Proximos Settings.sh` (with your settings values pre-filled) into the command body.
+4. Set **Run As** to **root**.
+5. Set **Event** to **Run as Repeating**, set **Command Repeats By** to **Week**, and select your desired day(s).
+6. Associate the command with your target **Mac Device Group(s)**.
+7. Click the **Save** button.
+
+> **Note:** A settings file deployed this way lands in `/Library/Preferences/` and can be deleted by a local administrator. We recommend scheduling this command to run on every check-in to ensure the file is always present.
+
+### Deploying the Proximos PPPC Profile
+
+1. In Proximos, go to **Settings → Extras → Export Full Profile** and save `Proximos PPPC Profile.mobileconfig`.
+2. In JumpCloud, go to **Device Management → Policy Management → \+ New Policy**.
+3. Select **Mac** as the platform, then search for and select **MDM Custom Configuration Profile**.
+4. Upload the `Proximos PPPC Profile.mobileconfig` file.
+5. Assign the policy to your target **Mac Device Group(s)** and activate it.
+
+### Deploying the System Launch Agent
+
+Because the Standard and Headless Launch Agent PKGs do not contain an `.app` bundle, they will fail JumpCloud's PKG validation and cannot be deployed through Software Management. Deploy the corresponding script instead — `Deploy Proximos System Launch Agent.sh` or `Deploy Proximos System Headless Launch Agent.sh` — as a Command, following the same steps as above with **Run As: root**. See [About the System Launch Agent](#about-the-system-launch-agent-and-system-headless-launch-agent) for guidance on choosing between them.
+
+---
+
+## About the System Launch Agent and System Headless Launch Agent
+
+Proximos includes two launch agent types for different deployment approaches. Both can be generated as installable `.pkg` files from **Settings → Extras → System Launch Agents**.
+
+### System Launch Agent (`com.enlazo.proximos`)
+
+- **Purpose:** Keeps the Proximos menu bar app running persistently for all users who log in.
+- **Behavior:** Launches Proximos at login and keeps it active in the menu bar. The app runs on a `StartInterval` of 10 seconds — checking on each wake whether it should perform the daily update check based on the configured daily run time.
+- **Best for:** Organizations that want Proximos visible in the menu bar as a persistent presence, allowing users to see their update status and manually trigger checks.
+- **PKG export:** **Settings → Extras → Export Standard .pkg**
+- **Script deployment:** `Deploy Proximos System Launch Agent.sh`
+- **Install path:** `/Library/LaunchAgents/com.enlazo.proximos.plist`
+
+### System Headless Launch Agent (`com.enlazo.proximos.headless`)
+
+- **Purpose:** Runs a Proximos update check once daily as a background process without keeping the app in the menu bar.
+- **Behavior:** Invokes `Proximos --check-for-updates` at the `StartCalendarInterval` time derived from the **Daily Run Time** setting configured when the PKG was generated. The process completes and exits. No menu bar icon is shown.
+- **Best for:** Organizations that want silent daily enforcement without a persistent app presence.
+- **PKG export:** **Settings → Extras → Export Headless .pkg**
+- **Script deployment:** `Deploy Proximos System Headless Launch Agent.sh`
+- **Install path:** `/Library/LaunchAgents/com.enlazo.proximos.headless.plist`
+
+### User Launch Agent (`com.enlazo.proximos`, user-level)
+
+- **Purpose:** A third launch agent type, distinct from the two system-level agents above — created not by MDM deployment, but by Proximos itself when the **Enable Proximos Launch Agent** setting (`enableProximosLaunchAgent`) is turned on in the settings plist.
+- **Behavior:** Installed into `~/Library/LaunchAgents/com.enlazo.proximos.plist` for the currently logged-in user the first time Proximos is opened after the setting is enabled.
+- **Best for:** Organizations that want persistent menu bar operation but prefer to control it entirely through the settings plist, without deploying a separate system-level PKG via MDM.
+- **Install path:** `~/Library/LaunchAgents/com.enlazo.proximos.plist` (per user)
+
+**Advantages and disadvantages versus the System Launch Agent:**
+
+The two approaches differ in two important ways — how they get installed for new users, and who can remove them.
+
+- **First-login automation:** The System Launch Agent, once deployed via MDM to `/Library/LaunchAgents/`, automatically launches Proximos for _any_ user who logs into the Mac, including brand-new accounts, with no manual step required. The User Launch Agent has no such automation — Proximos must be opened manually by each user at least once before it can write its launch agent into that user's home folder. On a shared Mac with multiple accounts, this means the User Launch Agent setting alone will not cover a new user until they've launched Proximos themselves.
+- **Tamper resistance:** Because the System Launch Agent lives in `/Library/LaunchAgents/` and is owned by `root:wheel`, a standard (non-admin) user cannot modify or delete it. The User Launch Agent, by contrast, lives inside the user's own home directory and is owned by that user — meaning a non-admin user _can_ delete or disable their own User Launch Agent if they choose to, since they have full write access to their own `~/Library/LaunchAgents/` folder.
+
+For environments where consistent, tamper-resistant persistence matters most, the System Launch Agent is the stronger choice. The User Launch Agent remains a convenient option for smaller deployments managed primarily through the settings plist rather than a separate MDM package.
+
+> You can deploy both system-level agents if you want the daily headless check alongside the persistent menu bar presence. In most environments, one or the other is sufficient.
+
+> **Note:** If a System Launch Agent is detected at `/Library/LaunchAgents/com.enlazo.proximos.plist`, the **Enable Proximos Launch Agent** checkbox in Settings → Main Settings is automatically grayed out and locked. The admin-deployed system agent already controls the app lifecycle and the user-level toggle is not editable.
+
+### Launch Agent Conflict Resolution
+
+A potential misconfiguration to be aware of: if the **Enable Proximos Launch Agent** setting is turned on in the Proximos settings plist (creating a user-level launch agent at `~/Library/LaunchAgents/com.enlazo.proximos.plist`) and a System Launch Agent is also deployed at `/Library/LaunchAgents/com.enlazo.proximos.plist`, both agents will initially be present. Having two launch agents managing the same application simultaneously is redundant and can cause unpredictable restart behavior.
+
+Proximos handles this automatically through the **Proximos Launch Agent Manager**. On each launch, it checks whether a system-level launch agent is present. If one is detected, the Launch Agent Manager removes the user-level launch agent from `~/Library/LaunchAgents/` and defers full control to the system agent. The system-level launch agent always takes priority.
+
+To avoid this conflict entirely, the recommended approach is to choose one method and use it consistently across your fleet:
+
+- Deploy the **System Launch Agent PKG** via MDM and leave **Enable Proximos Launch Agent** set to `false` in your settings plist.
+- Or enable **Enable Proximos Launch Agent** in your settings plist for user-managed persistent operation, without deploying the system-level PKG.
+
+If you are transitioning from one approach to the other — for example, moving from user-level to system-level launch agents — Proximos Launch Agent Manager will clean up the user-level agent automatically once the system agent is installed. No manual removal is required.
+
+### A Note on User Tampering
+
+As described above, a non-admin user can delete or disable their own User Launch Agent, and any user with local administrator rights can remove a System Launch Agent, delete the Proximos application, or edit a settings plist directly. Proximos includes the protections described throughout this documentation — Managed Mode, the blocked application list, PPPC profiles, and the conflict resolution behavior above — but no software running on a Mac can fully prevent a user with sufficient privileges from tampering with it.
+
+If an employee deliberately disables, removes, or otherwise tampers with Proximos, its launch agents, or its configuration files to avoid update compliance, this is a personnel and policy matter rather than a software issue, and is outside of Enlazo Systems' control. We recommend organizations treat deliberate tampering with required compliance software the same way they would treat circumventing any other IT security control — typically as a matter for HR or IT policy enforcement.

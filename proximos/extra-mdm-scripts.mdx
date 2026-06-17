@@ -1,0 +1,164 @@
+---
+title: "Extra MDM Scripts"
+description: "Deployment, removal, advanced, and standard MDM scripts bundled with Proximos."
+---
+
+Proximos ships with a set of additional shell scripts for MDM deployment and advanced management. These scripts help extend Proximos' functionality and make it a powerful tool for your institutional needs or compliance regulations. They are exported from **Settings → Extras → Export MDM Scripts** as the `Proximos MDM Scripts` folder. Each script can be deployed via any MDM solution:
+
+- **Jamf Pro:** Settings → Scripts
+- **Mosyle:** macOS → Custom Commands
+- **Addigy:** Devices → Scripts → Manage
+- **JumpCloud:** Device Management → Commands
+
+---
+
+## Deployment Scripts
+
+### Install or Update Proximos.sh
+
+Downloads the latest Proximos DMG from Enlazo Systems and installs or updates the Proximos application. Safe to run on Macs where Proximos is already installed — it updates to the latest version without removing settings.
+
+**Use for:** Initial deployment and keeping Proximos up to date across your fleet.
+
+---
+
+### Deploy Proximos Settings.sh
+
+Creates and deploys the Proximos settings plist at `/Library/Preferences/com.enlazo.proximos.settings.plist`, enabling Managed Mode on the target Mac. Customize the script with your organization's settings values before deploying.
+
+**Use for:** Pushing your IT-configured settings to managed Macs after initial app installation.
+
+> **Recommendation:** When possible, deploy the settings plist as a custom configuration profile into `/Library/Managed Preferences/` instead of using a script or PKG. A file written to `/Library/Preferences/` can be deleted by a local administrator, temporarily removing Managed Mode. Configuration profiles delivered through your MDM to `/Library/Managed Preferences/` are protected from user removal. If your MDM does not support custom configuration profiles and you must use a script or PKG, we recommend re-running the deployment script on every MDM policy check-in to ensure the file is always present.
+
+---
+
+### Deploy Proximos System Launch Agent.sh
+
+Installs the Proximos System Launch Agent at `/Library/LaunchAgents/com.enlazo.proximos.plist`, enabling Proximos to run persistently in the menu bar for all users who log in.
+
+**Use for:** Environments where you want Proximos visible in the menu bar as a persistent presence. Alternative to the **Export Standard .pkg** approach from within the app.
+
+> **Note:** A local administrator can delete the launch agent plist from `/Library/LaunchAgents/`, disabling persistent Proximos operation until it is redeployed. We recommend re-running this script on every MDM policy check-in to ensure the launch agent is always present.
+
+---
+
+### Deploy Proximos System Headless Launch Agent.sh
+
+Installs the Proximos System Headless Launch Agent at `/Library/LaunchAgents/com.enlazo.proximos.headless.plist`, which runs `Proximos --check-for-updates` once daily at the configured time without keeping the app in the menu bar.
+
+**Use for:** Silent daily enforcement without a persistent menu bar app. Alternative to the **Export Headless .pkg** approach from within the app.
+
+> **Note:** A local administrator can delete the launch agent plist from `/Library/LaunchAgents/`, disabling scheduled daily update checks until it is redeployed. We recommend re-running this script on every MDM policy check-in to ensure the launch agent is always present.
+
+---
+
+## Removal Scripts
+
+### Proximos Remove Launch Agents.sh
+
+Unloads and removes both the standard and headless Proximos System Launch Agents from `/Library/LaunchAgents/`. Does not remove the app or settings.
+
+**Use for:** Stopping persistent Proximos operation without fully uninstalling the app.
+
+---
+
+### Proximos Uninstaller.sh
+
+Fully uninstalls Proximos, including the application, all settings plists, runtime plists, and any launch agents (system-level and user-level).
+
+**Use for:** Full removal of Proximos from managed or unmanaged Macs.
+
+---
+
+## Advanced Scripts
+
+### Proximos Custom Notifications.sh
+
+Allows full customization of enrollment welcome notifications and daily countdown notification messages, for both minor and major upgrade workflows. Deploy this script to a common location on your Macs and reference it as a **Custom Pending Update Command** in Main Settings, or schedule it via your MDM. See [Custom Daily Notifications](/proximos/settings-overview#custom-daily-notifications) in Branding Settings for deployment guidance.
+
+> **Important:** This script must be edited and customized to your requirements before deployment. Shell syntax must be precise — any errors in the script may prevent it from functioning correctly. Enlazo Systems cannot take responsibility for or provide troubleshooting support for custom-edited scripts.
+
+---
+
+### Proximos startosinstall Major Enforce.sh
+
+Provides a powerful silent or semi-silent major macOS upgrade path using `startosinstall`. This script can upgrade a Mac to a new major macOS version completely automatically — no user interaction, no password prompt, and no Nudge window required. The upgrade initiates and completes silently in the background, making it ideal for unattended Macs, server Macs, or users who have exhausted their deferral window and need to be upgraded without any friction.
+
+An optional user-facing popup can be enabled before initiation to notify the user that an upgrade is about to begin, giving them a brief window to save their work.
+
+Because `startosinstall` requires the credentials of a local administrator account with a SecureToken, those credentials must be embedded directly in the script's settings variables, encoded in Base64. The deployed Mac's local administrator username and password must be entered into the designated variables at the top of the script before deployment. **This script should only ever be deployed and run via your MDM solution** — not distributed as a file — so that the credentials remain protected within your MDM's secure script storage and are never exposed on disk. Running it from MDM as a privileged script ensures the credentials are passed at execution time without leaving a persistent copy on the Mac.
+
+**Use for:**
+
+- Fully automated silent major macOS upgrades on unattended or server Macs
+- Enforcing upgrades on user Macs when the deferral window has closed and waiting for Nudge interaction is not practical
+- Fleet-wide major upgrade pushes initiated and controlled entirely from your MDM
+
+---
+
+## Standard MDM Command Scripts
+
+These scripts wrap the Proximos CLI commands for MDM deployment.
+
+### proximos --disable-updates-until.sh
+
+Wraps the `--disable-updates-until` CLI command. Disables scheduled and launch-time update runs until midnight of the specified date.
+
+**Use for:** Temporary enforcement pauses during IT freeze windows, major events, critical project deadlines, or user requests.
+
+---
+
+### proximos --resume-updates.sh
+
+Wraps the `--resume-updates` CLI command. Re-enables scheduled update runs before the `--disable-updates-until` end date.
+
+**Use for:** Cancelling a scheduled enforcement pause early — for example when a user's project deadline has passed or an IT freeze window ends sooner than planned.
+
+---
+
+### proximos --clear-nudge.sh
+
+Wraps the `--clear-nudge` CLI command. Kills the running Nudge process and unloads the Nudge LaunchAgent for the logged-in user.
+
+**Use for:** User-requested enforcement relief via MDM without manual intervention on the Mac.
+
+---
+
+### proximos --skip-macosversion.sh
+
+Wraps the `--skip-macosversion` CLI command. Suppresses enforcement for a specific macOS version string.
+
+**Use for:** Pausing enforcement of a specific point release fleet-wide — for example when a macOS update has a known compatibility issue with critical software in your environment, or when a version is not yet approved for your organization.
+
+---
+
+### proximos --remove-skip.sh
+
+Wraps the `--remove-skip` CLI command. Removes a previously set version skip, immediately restoring enforcement.
+
+**Use for:** Re-enabling enforcement after a version skip has been resolved — for example once a software compatibility issue has been fixed and the skipped macOS version is approved for deployment.
+
+---
+
+## Extension Attributes
+
+These scripts surface Proximos runtime status data in your MDM inventory. Each reads from the user's runtime plist at `~/Library/Preferences/com.enlazo.proximos-runtime.plist`.
+
+| Attribute | Type | Description |
+| --- | --- | --- |
+| `currentMode` | String | Returns `"minor"`, `"major"`, or `"enrollment"` — the current operating mode of the last engine run |
+| `daysRemaining` | Integer | Negative = days remaining before enforcement deadline. Positive = days past the deadline |
+| `isLicensed` | Boolean | `true` if a valid Proximos license key is present and successfully decoded |
+| `LastRun` | Date | ISO-8601 timestamp of the most recent Proximos update check run |
+| `majorInstallerDownloadError` | Integer | Non-zero exit code from `softwareupdate --fetch-full-installer` if the major installer download failed |
+| `majorReleaseName` | String | The detected macOS major release marketing name (e.g., `"Tahoe"`) |
+| `skipmacOSVersion` | String | The macOS version string currently set as the skip sentinel, if any |
+| `softwareupdateError` | Integer | Exit code from `softwareupdate --list` if it failed. `0` means it ran cleanly but reported no updates available for this Mac |
+| `updateAvailable` | Boolean | `true` if a macOS update is currently required for this Mac |
+| `updateVersion` | String | The currently detected available macOS version (e.g., `"15.5"`, `"26"`, or `"enrollment"` during the grace period) |
+
+**MDM Configuration:**
+
+- **Jamf Pro:** Settings → Extension Attributes (Script type, echo return value)
+- **Mosyle:** Custom Command with the Custom Attribute checkbox enabled
+- **Addigy:** Catalog → Custom Fact

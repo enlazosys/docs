@@ -1,0 +1,139 @@
+---
+title: "Getting Started"
+description: "Install Proximos, purchase and enter a license, and configure your first Mac."
+---
+
+## What Is Proximos?
+
+Proximos is a lightweight macOS menu bar application that helps keep your Macs up to date via user notifications and encouragement. We understand that enforcing updates on macOS is inherently difficult — macOS updates generally require the user to enter their own password to proceed, which means encouragement and clear communication matter just as much as enforcement. It runs daily at a configured time, queries the Proximos Engine for the latest required macOS version, and sends friendly notification banners to users at key milestones throughout the countdown using a branded IBM Notifier. When the enforcement deadline arrives, Proximos deploys the open-source Nudge tool to enforce the update.
+
+This division of labor is deliberate. Nudge is a powerful enforcement tool, however its own scheduling and deferral system has been a common source of complaints among Mac admins. Proximos keeps Nudge at bay and uses it sparingly, reserved strictly for past-due enforcement once the deadline has already arrived. Everything before that point — the entire countdown — is handled through Proximos's own friendlier notification system instead, so users only ever see Nudge when it actually matters.
+
+Proximos is designed to be configured once on an IT admin Mac, then deployed broadly — whether to a handful of Macs in a small office or thousands of endpoints managed by an MDM platform.
+
+---
+
+## Standard Installation
+
+### Requirements
+
+- macOS 13.5 or later, on either Apple Silicon (ARM) or Intel Macs
+- A valid Proximos license key
+- An active network connection for license validation and update checks
+- Approximately 20 MB of free disk space for the Proximos application itself
+- Approximately 200 MB of available RAM while Proximos is running
+- For major macOS upgrades, approximately 18 GB of free disk space to download the full macOS installer
+
+### About the Application
+
+- Built with Xcode 26, with a deployment target of macOS 13.5.
+- Proximos is a traditional, legacy-style menu bar app — it is not written using SwiftUI's `MenuBarExtra`.
+- The app is not sandboxed, and does not use a Group Container for its bundled preferences.
+
+SwiftUI's `MenuBarExtra` and full app sandboxing are both goals under consideration for a potential future Proximos 2.0, but are not part of the current architecture.
+
+### Supported Install Locations
+
+Proximos is designed to run from any of the following locations:
+
+- `/Applications/`
+- `/Applications/Utilities/` (recommended)
+- `/usr/local/bin/` — a discreet, hidden-from-Finder location not normally browsed by end users, which offers some additional protection against casual user tampering compared to the `/Applications/` folder
+
+If you deploy a System Launch Agent PKG, Proximos must remain installed at the same path that was active when the PKG was generated, since the binary path is baked into the launch agent plist at export time. See [About the System Launch Agent](/proximos/mdm-deployment#about-the-system-launch-agent-and-system-headless-launch-agent) for details.
+
+### Installing from DMG
+
+1. Download the latest Proximos DMG from [enlazosystems.com](https://enlazosystems.com) or from the link provided in your purchase confirmation email.
+2. Open the DMG file by double-clicking it.
+3. In the installer window, drag **Proximos.app** into the **Utilities** folder alias shown. Proximos is designed to live at `/Applications/Utilities/Proximos.app`.
+4. Eject the DMG once the copy is complete.
+5. Open Proximos from `/Applications/Utilities/`. On first launch, macOS may ask you to confirm opening an app from the internet — click **Open**.
+
+> **Note:** Proximos can also be installed via a provided `.pkg` installer or via MDM scripted installation. See the [MDM Deployment](/proximos/mdm-deployment) section for details.
+
+---
+
+## Purchasing a License
+
+Proximos is a monthly subscription available directly from Enlazo Systems. Licensing is device-based — you purchase a pack that covers a set number of Macs.
+
+When Proximos launches for the first time without a license key present in its settings, it displays the **Proximos License Manager** window. The lower portion of that window shows a **Purchase Proximos** section with a description and a dropdown menu labeled **"Select Subscription Tier…"** listing all available plans. Selecting a tier loads the corresponding Stripe checkout page directly inside the License Manager window. An **Open in Browser** button is also available to open the checkout in your default browser instead.
+
+You can also browse available plans and purchase directly at [enlazosystems.com](https://enlazosystems.com). Educational institutions can request a 30% discount code from the Enlazo Systems website using a `.edu` email address — see [Educational Discounts](/proximos/licensing-overview#educational-discounts) for details.
+
+Upon successful purchase, your license key will be delivered to the email address provided at checkout.
+
+---
+
+## Entering Your License Key
+
+Once you have your license key:
+
+1. Open Proximos from your menu bar or from `/Applications/Utilities/Proximos.app`.
+2. The **Proximos License Manager** window will be displayed. Paste your license key into the **Proximos License Key** field and click **Save License**.
+3. Proximos closes the License Manager and validates your key against the Proximos Engine on the next update check run.
+
+In Standard mode, the License Manager is accessible to the IT admin at any time from the menu bar icon. In Managed Mode, the License Manager is not accessible to the user. With a license key present, the License Manager shows your **License Count** (the number of unique Macs connected in the past 30 days), a **Download Report** button to retrieve a CSV of connected devices, and a **Manage** button that opens the Stripe subscription portal for payment method and billing management.
+
+The license key is stored Base64-encoded in the Proximos settings plist at one of the following locations, in priority order:
+
+- **MDM-managed:** `/Library/Managed Preferences/com.enlazo.proximos.settings.plist`
+- **IT-deployed:** `/Library/Preferences/com.enlazo.proximos.settings.plist`
+- **User-level (first launch):** `~/Library/Preferences/com.enlazo.proximos.settings.plist`
+
+---
+
+## Testing Proximos
+
+After installation and license entry, verify Proximos is working correctly before wider deployment.
+
+### Run a Manual Update Check
+
+1. Click the Proximos icon in the menu bar.
+2. Select **Check for macOS Updates**.
+3. Proximos contacts the Proximos Engine, retrieves the latest required macOS version, computes the enforcement countdown, and takes the appropriate action (notification, Nudge launch, or confirms up to date).
+4. Review the menu bar status, which reflects the current state — such as "macOS is Up to Date", a countdown, or the target update version.
+
+### Review the Console Log
+
+Open **Console.app** and filter for `com.enlazo.proximos` to see detailed log output from the engine. Look for entries confirming:
+
+- Settings plist loaded successfully
+- License key decoded and validated
+- API response received with macOS version and release date
+- Enrollment grace period status
+- Notification or Nudge dispatch confirmed
+
+### Test Notifications
+
+Ensure notifications are enabled for Proximos in **System Settings → Notifications**. On first run, macOS may prompt you to allow notifications from Proximos and its bundled notifier app. For the best experience, deploy the Proximos PPPC Notifications Profile from **Settings → Extras** before testing.
+
+### How to Test the Countdown and Enforcement
+
+A built-in testing guide is available in the Settings window by clicking the **ⓘ** help button next to the Main Settings header. It summarizes the following steps:
+
+1. A macOS update must be available on the Mac running Proximos. If none is available, wait for a new release or use another Mac with an available update.
+2. Disable the Enrollment Grace Period if needed to skip the grace period gate.
+3. Adjust the **Enforce Update On Day** setting, save the changes, then run **Check for macOS Updates** from the menu bar.
+4. The enforcement date is calculated from the release date of the next available macOS version returned by the Proximos Engine. Change the **Enforce Update On Day** value to test different countdown milestones and past-due enforcement behavior.
+5. When testing past-due enforcement, you can close Nudge using the **Clear Nudge** button in **Settings → Help**.
+6. To test a major macOS upgrade, enable **Major Mode** in **Settings → Major Settings** with a set enforcement version and date, then run **Check for macOS Updates**.
+7. After testing, configure your final settings and export them from **Settings → Export Settings** for USB thumb drive or MDM deployment. Deploying the plist file enables Managed Mode on devices.
+
+---
+
+## Configuring Settings
+
+After successful testing, review and adjust the Proximos settings to match your organization's requirements before deploying to additional Macs. See the [Settings Overview](/proximos/settings-overview) section for a full description of every available option.
+
+**Key settings to configure before deployment:**
+
+- **Company Name** — appears in enrollment notifications
+- **Enforce Update On Day** — days after Apple's release date before Nudge begins enforcement
+- **Daily Run Time** — when Proximos checks for updates each day
+- **Enrollment Grace Period** — how many days new Macs are exempt from enforcement
+- **Nudge Update Elements** — the header, body text, and subheader shown inside the Nudge window
+- **Major Settings** — if you need to enforce a major macOS upgrade
+
+Once configured, export your settings from **Settings → Export Settings** and deploy to other Macs. See [MDM Deployment](/proximos/mdm-deployment) for details.
