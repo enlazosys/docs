@@ -1,0 +1,39 @@
+---
+title: "What About DDM?"
+description: "How Proximos compares to and works alongside Apple's Declarative Device Management."
+---
+
+Apple's Declarative Device Management (DDM) framework includes the ability to enforce macOS software updates directly from the MDM layer, without any third-party tooling. It's a meaningful capability, and Proximos is designed to complement it rather than compete with it. This page covers what DDM does well, where it falls short in practice, and how to run Proximos and DDM together for a more complete patching strategy.
+
+## DDM Advantages
+
+DDM enforcement comes directly from Apple and integrates natively with your MDM, which gives it some real strengths:
+
+- **Direct from the manufacturer.** Update enforcement instructions come from Apple's own framework rather than a third-party agent, which many security and compliance teams find inherently trustworthy.
+- **Scheduled enforcement with similar daily notifications.** Like Proximos, DDM can be configured with a countdown and recurring reminders leading up to a deadline.
+- **Works well with compliant users.** For a user who responds to mac OS prompts promptly, DDM's installation flow is smooth and requires no third-party software at all.
+- **Easy to configure and implement.** DDM software update policies are typically a few fields in your MDM console, with no scripting or additional infrastructure required.
+
+## DDM Disadvantages
+
+In practice, DDM enforcement has a number of real-world conditions that can prevent an update from ever completing, which is the gap Proximos is built to help close:
+
+- **Requires an MDM service with DDM support**, and is only fully functional when the Mac is enrolled through Apple Business Manager into MDM, since that enrollment path is what supplies the bootstrap token DDM needs to authorize unattended installation steps. In practice, a Mac environment with 100% Apple Business Manager enrollment is usually never achieved — older devices, contractor machines, personally owned Macs under BYOD policies, and Macs enrolled before ABM was adopted commonly fall outside this coverage, leaving a meaningful portion of the fleet without full DDM functionality.
+- **Still requires the user to enter their password to update.** If the user avoids entering it, the update will likely never install — DDM does not bypass the human cooperation requirement described in [Why Does Proximos Exist?](/proximos/why-does-proximos-exist).
+- **Will not install if the MacBook's lid is closed.**
+- **Will not install if the battery charge is below 50%.**
+- **Will not install if applications are left open with unsaved documents.**
+- **Will not install if the Mac is shut down early.** Alongside a closed lid or open applications, simply powering off the Mac is another way enforcement can be avoided — DDM update windows require the Mac to be powered on and awake to act.
+- **Can give up over time.** In our experience, if a user avoids enforcement for more than about a week, DDM can stop attempting the update altogether, leaving the Mac out of compliance with no further automatic retries.
+
+## Using Proximos and DDM Together
+
+For the most thorough patching policy, Proximos and DDM are not an either-or choice — they can be configured to coexist. A few configurations we see work well:
+
+**1. Proximos and DDM set to the same number of days.** In practice, this has the user receive Nudge enforcement at the Proximos daily run time, while the DDM-driven update attempt typically runs later that same night — giving you two independent enforcement attempts on the same day.
+
+**2. DDM enforcement set one or more days after Proximos enforcement.** This gives the user a buffer of one or more days past the Proximos enforcement deadline before Apple's DDM framework begins attempting forced restarts to complete the install — Proximos drives the early, user-facing nudge, and DDM is the backstop if the user still hasn't acted.
+
+**3. Nudge disabled in Proximos, with DDM enforcement enabled.** Set Proximos and DDM to the same number of days, and turn off Nudge in **Settings → Main Settings → Disable Nudge Integration**. In this configuration, Proximos's friendly branded countdown notifications still appear daily, but final enforcement is left entirely to DDM rather than Nudge.
+
+**4. Notifications and Nudge both disabled in Proximos, with DDM enforcement enabled.** Set Proximos and DDM to the same number of days, and disable both notifications and Nudge in Proximos Main Settings. This configuration is for organizations that want to drive the entire user-facing experience through DDM, while still using Proximos's **Custom Pending Update Command** and **Custom Past Due Command** settings to run their own scripts, telemetry, or compliance actions in the background on each daily check — a powerful way to layer custom logic on top of DDM's native enforcement without any user-facing duplication.

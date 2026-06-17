@@ -1,0 +1,50 @@
+---
+title: "About the Proximos Engine"
+description: "The AWS-based backend, GDMF polling, licensing, payments, and networking behind Proximos."
+---
+
+## AWS Architecture
+
+The Proximos Engine is a cloud-based backend built on AWS, purpose-built to serve macOS update data to Proximos clients reliably, at scale, and with minimal latency.
+
+## Apple GDMF Polling
+
+At the heart of the engine is an **AWS Lambda function** that polls Apple's **GDMF (Global Device Management Feed)** every five minutes. GDMF is Apple's authoritative feed for macOS software update availability, used by MDM solutions to determine which updates are available for managed devices.
+
+By polling GDMF continuously on a five-minute interval, the Proximos Engine has the most current update data within minutes of Apple publishing a new macOS release. Proximos clients begin counting down to enforcement within hours of a new update becoming public, with no manual intervention required from the Proximos team.
+
+## Database and API
+
+Update data from GDMF is stored in a Proximos-managed database. The engine exposes an authenticated REST API that client Macs query during each Minor Engine run. The API accepts the device's current macOS version as a path parameter and the license key in the `Authorization` request header, returning the latest required macOS version and its Apple release date.
+
+The API includes automatic failover: Proximos clients first attempt the primary endpoint (`https://proximosappengine.enlazosystems.com/`) and fall back to a secondary AWS endpoint if the primary is unreachable or returns a 5xx error. Both endpoints query the same database and return identical data.
+
+If the device is offline or the request times out, the engine exits without changing the license status or `LastRun` timestamp in the runtime plist, preserving the existing state until connectivity is restored.
+
+## License Authentication
+
+License validation is handled through the API layer. Every request includes the license key in the `Authorization` header and an application key in the `AppKey` header. The database tracks which license keys are valid, their tier, and the Mac UUID of each device that has checked in. The Mac's hardware UUID is passed as a query parameter on every API call and logged in AWS CloudWatch for device count tracking — this data feeds the automated tier upgrade logic.
+
+## Payment Processing
+
+Stripe handles all payment processing, subscription management, and billing. When you purchase a Proximos subscription, checkout is handled by Stripe Checkout embedded directly within the Proximos License Manager window or opened in your browser. Subscription renewal, cancellation, and plan changes are processed through Stripe.
+
+The **Manage** button in the Proximos License Manager opens the Stripe subscription portal (embedded in a WebView within the License Manager window) for managing payment methods and billing details.
+
+## License Management
+
+License key generation, validation, and tier management are handled through a custom AWS-based system built on Stripe webhooks. When a Stripe subscription event fires (new subscription, renewal, cancellation, or upgrade), a corresponding Lambda function updates the license database, activating, renewing, or deactivating license keys automatically.
+
+## Networking
+
+If your network requires firewall or proxy allowlisting, Proximos communicates with the following Enlazo Systems domains over standard HTTPS (port 443) using TLS 1.2:
+
+| Domain | Purpose |
+| --- | --- |
+| `proximosappengine.enlazosystems.com` | Primary and secondary API endpoints for macOS update checks |
+| `proximosapplicensing.enlazosystems.com` | License key validation and licensing data |
+| `files.enlazosystems.com` | Sparkle application update checks and downloads |
+| `buy.enlazosystems.com` | HTTPS redirect for license purchases |
+| `app.link.com` | Web portal for managing and purchasing licenses |
+
+No other ports or protocols are used — all communication is standard HTTPS/TLS over port 443.

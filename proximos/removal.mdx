@@ -1,0 +1,47 @@
+---
+title: "Removal"
+description: "Uninstalling Proximos and its launch agents manually or via MDM scripts."
+---
+
+## Standard Removal with Built-In Uninstall
+
+Proximos includes a built-in uninstaller accessible from the Settings window:
+
+1. Click the Proximos icon in the menu bar.
+2. Select **Settings**.
+3. Navigate to the **Help** tab.
+4. Click **Uninstall Proximos**.
+5. Confirm the action when prompted.
+
+The built-in uninstaller removes the Proximos application and its associated settings plists, runtime plists, and any user-level launch agents it has created.
+
+---
+
+## Removal with Provided MDM Scripts
+
+For managed environments, use the **Proximos Uninstaller.sh** script:
+
+- **Jamf Pro:** Settings → Scripts → deploy via Policy
+- **Mosyle:** macOS → Custom Commands
+- **Addigy:** Devices → Scripts → Manage
+- **JumpCloud:** Device Management → Commands
+
+The uninstaller script fully removes:
+
+- `/Applications/Utilities/Proximos.app`
+- The system-level settings plist at `/Library/Preferences/com.enlazo.proximos.settings.plist`
+- Any managed preferences at `/Library/Managed Preferences/com.enlazo.proximos.settings.plist`
+- User-level runtime plists and settings plists
+
+---
+
+## Removal of System Launch Agents with Provided MDM Scripts
+
+To remove only the System Launch Agents without uninstalling the full app, use **Proximos Remove Launch Agents.sh**:
+
+- **Jamf Pro:** Settings → Scripts → deploy via Policy
+- **Mosyle:** macOS → Custom Commands
+- **Addigy:** Devices → Scripts → Manage
+- **JumpCloud:** Device Management → Commands
+
+This script unloads and removes both the standard and headless launch agents from `/Library/LaunchAgents/`, stopping persistent Proximos operation without removing the app or settings.

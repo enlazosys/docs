@@ -1,0 +1,258 @@
+---
+title: "Logic Overview"
+description: "How the Minor Engine and Major Engine evaluate updates, countdowns, and Nudge enforcement."
+---
+
+## Minor Engine
+
+The Minor Engine is the core of the standard minor update workflow. It runs once per daily trigger — whether from the menu bar app, the headless CLI launch agent, or a manual check.
+
+### Minor Engine Step-by-Step
+
+**1. Notifier check:** Verifies the Proximos Notifier app is present in the bundle. If missing, the run aborts.
+
+**2. Beta seed check:** Runs `seedutil current` to detect if the Mac is enrolled in an Apple beta software seed. Beta Macs are excluded from enforcement — the run exits.
+
+**3. Console user check:** Resolves the currently logged-in GUI user. If no user is logged in (login window or setup assistant), the run exits — enforcement requires an active user session.
+
+**4. Enrollment grace period evaluation:** Checks the user's runtime plist for `EnrollmentDate`. If not present, sets today as the enrollment date and shows the welcome notification. Computes days since enrollment vs. the configured grace period days. If still within the grace period, shows a countdown notification and exits.
+
+**5. API call:** Contacts the Proximos Engine at `https://proximosappengine.enlazosystems.com/` with automatic fallback to a secondary AWS endpoint. Sends the device's current macOS version and license key. The API returns the required target macOS version and Apple's release date for that version.
+
+**6. Version comparison:** Compares the device version to the API target. If already up to date, or running a newer version (beta), disables any existing Nudge setup and exits cleanly.
+
+**7. Enforcement date calculation:** Computes `enforcementCount` = days since Apple's release date minus `enforceUpdateOnDay`. Negative = days remaining before the deadline. Zero or positive = past due.
+
+**8. Version skip check:** Checks the runtime plist for a `skipmacOSVersion` key. If set and matching the target version, writes the current update status to the plist (so the menu bar and MDM attributes remain current) and exits before any notification or Nudge action fires.
+
+**9. Notification dispatch (pre-enforcement):** If `enforcementCount` matches one of the specific milestone values (−30, −25, −20, −15, −10, −5, −4, −3, −2, −1), sends a countdown notification via the bundled notifier and exits. Proximos does not use Nudge during this period.
+
+**10. softwareupdate availability gate (past enforcement date):** When `enforcementCount >= 0`, runs `softwareupdate --list` to confirm the target version is actually available to this Mac before launching Nudge. Four outcomes:
+
+- **available:** Target version confirmed — proceed to Nudge
+- **mismatch:** Other macOS updates listed but not the exact target version — record the mismatch but still proceed to Nudge
+- **noUpdates:** No macOS updates offered at all — skip Nudge, record error code `0` in plist
+- **error:** `softwareupdate` exited non-zero — skip Nudge, record exit code in plist
+
+**11. Nudge launch (past enforcement date):** Writes the Nudge JSON configuration file and either launches Nudge directly or installs/updates the Nudge LaunchAgent, depending on `enableNudgeLaunchAgent`.
+
+**12. License status update:** Writes the current license validation result to the runtime plist.
+
+---
+
+### Enrollment Period → Minor Engine Flowchart
+
+```text
+Minor Engine triggered
+        │
+        ▼
+Notifier present? ──No──► Exit
+        │Yes
+        ▼
+On Apple beta seed? ──Yes──► Exit
+        │No
+        ▼
+Console user logged in? ──No──► Exit
+        │Yes
+        ▼
+Enrollment grace period enabled?
+   │No                          │Yes
+   │                            ▼
+   │                   EnrollmentDate in runtime plist?
+   │                      │No                │Yes
+   │                      ▼                  ▼
+   │               Set today as        Read existing
+   │               EnrollmentDate      EnrollmentDate
+   │                      │                  │
+   │                      └──────┬───────────┘
+   │                             ▼
+   │                  Days since enrollment vs. grace period days
+   │                             │
+   │                  Still within grace? ──Yes──► Show enrollment notification → Exit
+   │                             │No
+   └────────────────────────────►▼
+                     Contact Proximos Engine API
+                                 │
+                     API returned result? ──No (offline/auth error)──► Exit (preserve license/LastRun)
+                                 │Yes
+                                 ▼
+                     Device already up to date? ──Yes──► Disable Nudge → Exit
+                                 │No
+                                 ▼
+                     Compute enforcementCount
+                     (negative = days remaining, 0+ = past due)
+                                 │
+                                 ▼
+                     Write update status to runtime plist
+                                 │
+                                 ▼
+                     Version skipped? ──Yes──► Exit (status written, enforcement suppressed)
+                                 │No
+                                 ▼
+                     enforcementCount at notification milestone?
+                     (−30, −25, −20, −15, −10, −5, −4, −3, −2, −1)
+                                ──Yes──► Send countdown notification → Exit
+                                 │No
+                                 ▼
+                     enforcementCount >= 0 (PAST DUE)?
+                                 │Yes
+                                 ▼
+                     softwareupdate --list check
+                     (unless Skip Software Update Validation enabled)
+                     │noUpdates/error    │available/mismatch
+                     ▼                   ▼
+                     Exit (record       Write Nudge JSON config
+                     error code)        and launch Nudge
+                                        (direct or via LaunchAgent)
+```
+
+---
+
+## Major Engine
+
+The Major Engine handles enforcement of major macOS upgrades. It activates when `enableMajorMode = true` in the settings.
+
+Unlike the minor engine, the major engine does **not** contact the Proximos API. All enforcement scheduling is driven by the `enforceMajorReleaseDate` date configured in Major Settings. The major engine also downloads the macOS installer if it is not already present on the Mac.
+
+### Major Engine Step-by-Step
+
+**1. Notifier check:** Same as minor engine — verifies the notifier is present.
+
+**2. Console user check:** Same as minor engine.
+
+**3. Target version check:** Reads `majorVersionToEnforce` from settings and compares to the device's current major macOS version. If the device is already on or ahead of the target major version, disables any Nudge and returns `alreadyOnTargetMajor` or `deviceNewerThanTarget` — the caller (AppDelegate) then runs the standard minor engine to handle point release updates for the current release line.
+
+**4. Enrollment grace period:** Same logic as the minor engine. If within the grace period, shows the enrollment notification and exits.
+
+**5. Installer name resolution:** Queries `softwareupdate --list-full-installers` to find the correct installer for the target major version, parsing the output for the release name (e.g., "Tahoe") and version string (e.g., "26.0"). The result is cached in the runtime plist so subsequent runs skip the network call if the installer name is already known and the version matches.
+
+**6. Installer download:** Checks for the installer at `/Applications/Install macOS [Name].app`. If missing, runs `softwareupdate --fetch-full-installer --full-installer-version [version]` to download it, showing a download notification to the user. Any download error exit code is written to the runtime plist as `majorInstallerDownloadError`.
+
+**7. Enforcement date calculation:** Computes `enforcementCount` by comparing today's date to `enforceMajorReleaseDate`. Unlike the minor engine which offsets from Apple's release date, the major engine uses the admin-configured enforcement date directly.
+
+**8. Notification dispatch (pre-enforcement):** Same milestone countdown as minor engine: −30, −25, −20, −15, −10, −5, −4, −3, −2, −1 days.
+
+**9. Nudge launch (past enforcement date):** Writes the Nudge JSON configuration (with `majorUpgradeAppPath` pointing to the downloaded installer) and launches Nudge or the Nudge LaunchAgent as configured.
+
+---
+
+### Enrollment Period → Major Engine Flowchart
+
+```text
+Major Engine triggered
+        │
+        ▼
+Notifier present? ──No──► fatalError
+        │Yes
+        ▼
+Console user logged in? ──No──► fatalError
+        │Yes
+        ▼
+Device major version >= majorVersionToEnforce?
+   │Already on target          │Device newer than target
+   ▼                           ▼
+Disable Nudge             Disable Nudge
+→ alreadyOnTargetMajor    → deviceNewerThanTarget
+(caller runs minor engine) (caller runs minor engine)
+        │
+        ▼ (device is BELOW target major version)
+Enrollment grace period check (same as minor engine)
+   │Within grace               │Past grace
+   ▼                           ▼
+Show enrollment             Continue
+notification → .handled
+        │
+        ▼
+Resolve installer name from softwareupdate --list-full-installers
+(use cached majorReleaseName from runtime plist if available and version matches)
+        │
+        ▼
+Installer .app present at /Applications/Install macOS [Name].app?
+   │No                         │Yes
+   ▼                           ▼
+Download via softwareupdate   Skip download
+--fetch-full-installer
+Record majorInstallerDownloadError if failed
+        │
+        ▼ (installer must be present to continue)
+Installer still missing after download? ──Yes──► fatalError
+        │No
+        ▼
+Compute enforcementCount from enforceMajorReleaseDate
+(negative = days remaining, 0+ = past due)
+        │
+        ▼
+Write update status to runtime plist (majorReleaseName, daysRemaining, updateVersion)
+        │
+        ▼
+enforcementCount at milestone? ──Yes──► Send major upgrade countdown notification → .handled
+(−30, −25, −20, −15, −10, −5, −4, −3, −2, −1)
+        │No
+        ▼
+enforcementCount >= 0 (PAST DUE)?
+        │Yes
+        ▼
+Write Nudge JSON (with majorUpgradeAppPath, Nudge Major Update Elements, enableSelfService)
+and launch Nudge (direct or via LaunchAgent)
+→ .handled
+```
+
+---
+
+## How Nudge Enforcement Works
+
+Proximos uses [Nudge](https://github.com/macadmins/nudge) as the enforcement layer for requiring users to complete macOS updates. Understanding the relationship between Proximos and Nudge is important for planning your enforcement strategy.
+
+### The Countdown Period — Notifications Only
+
+During the countdown — while `enforcementCount` is negative — Proximos **never opens Nudge**. Instead, it sends informational notification banners via the bundled IBM Notifier at specific milestone days. These are standard macOS notification banners users can dismiss. The intent is to give users advance warning with low friction before mandatory enforcement begins.
+
+Notifications fire only on specific milestone days, not every day:
+
+- 30 days remaining
+- 25 days remaining
+- 20 days remaining
+- 15 days remaining
+- 10 days remaining
+- 5 days remaining
+- 4 days remaining
+- 3 days remaining
+- 2 days remaining
+- 1 day remaining
+
+On all other days before the deadline, no notification fires and no action is taken.
+
+### The Enforcement Period — Nudge
+
+When `enforcementCount` reaches 0 (the deadline day) or greater (past due), Proximos switches from notifications to Nudge. Proximos generates the Nudge JSON configuration file and either launches Nudge immediately or installs/updates the Nudge LaunchAgent.
+
+Nudge presents a persistent window that follows the user across Spaces, can cover other applications, and provides an **Update** button. Nudge's `elapsedRefreshCycle` determines how often it re-checks compliance while open. The Aggressive User Experience and blocking options in Nudge Settings further control how firmly Nudge enforces the requirement.
+
+### The softwareupdate Availability Gate
+
+Before Nudge launches, Proximos runs `softwareupdate --list` to confirm the target macOS version is actually offered to this Mac's specific hardware. This prevents Nudge from running on Macs where the update isn't available. If the check reports no updates, Proximos skips Nudge and records a diagnostic code in the runtime plist as `softwareupdateError`.
+
+Enable **Skip Software Update Validation** in Main Settings to bypass this gate and always enforce with Nudge when past the deadline.
+
+### Nudge LaunchAgent vs. Direct Launch
+
+**Direct launch (default):** Proximos launches Nudge immediately when enforcement is triggered. Nudge runs for the current session.
+
+**Nudge LaunchAgent mode (`enableNudgeLaunchAgent = true`):** Proximos writes the Nudge JSON and installs a Nudge LaunchAgent (`com.github.macadmins.Nudge`) for the user. The agent runs Nudge on the `nudgeNagInterval` schedule (default: 15 minutes), providing persistent nagging between Proximos daily runs and surviving restarts within the user's session.
+
+---
+
+## Handling a Corrupted or Misconfigured Settings File
+
+Every Minor Engine and Major Engine run begins by decoding the active settings plist. If that plist contains a syntax error or an invalid value — for example from manual hand-editing, a botched find-and-replace, or a corrupted file transfer — Proximos cannot safely proceed with the engine logic described above.
+
+When this happens, Proximos does not crash or silently fail. Instead, it displays a caution icon in the menu bar along with user-facing warning text indicating that the configuration could not be read, and the engine remains inoperable — no notifications are sent and no enforcement runs — until the problem is resolved.
+
+**To recover:**
+
+1. Redeploy a corrected settings plist to the appropriate location (`/Library/Managed Preferences/`, `/Library/Preferences/`, or the user's `~/Library/Preferences/`, depending on your deployment method).
+2. Restart the Proximos application, or restart the Mac, to force Proximos to re-read the corrected file immediately.
+
+If you cannot restart the app or Mac right away, Proximos will also auto-repair on its own: once a corrected plist is in place, the next scheduled daily run time will pick it up automatically and resume normal operation without any manual restart.
+
+> **Recommendation:** Always create and export your settings file using the Proximos application itself (**Settings → Export Settings**) rather than hand-editing the XML plist in a text editor. The export process guarantees valid plist syntax and correctly typed values, which avoids this failure mode entirely. See [Export Settings Tab](/proximos/settings-overview#export-settings-tab) for details.
