@@ -164,7 +164,7 @@ Because Addigy cannot deploy a raw `.plist` as a Custom Profile, settings must b
 4. While configuring the Software item, go to **Options → Conditions for Install**, enable the **"if app"** checkbox, and set the condition so the Proximos application at `/Applications/Utilities/Proximos` is equal to or greater than version `1.0`. This causes the settings file to be redeployed on every policy check-in.
 5. Assign the Smart Software item to the appropriate policies or device groups.
 
-> **Alternative:** Instead of uploading the PKG, you can copy and paste the contents of the included `Deploy Proximos Settings - Managed Mode.sh` script (customized with your settings values) directly into the **Installation Command** field of the same Smart Software item.
+> **Alternative:** Instead of uploading the PKG, you can copy and paste the contents of the included `Deploy Proximos Settings - Managed Mode.sh` script (customized with your settings values) directly into the **Installation Command** field of the same Smart Software item. This method has advantages if you would like to manually edit the Proximos Settings plist file without having to use the Proximos App to export a new PKG.
 
 **Option 2 — Script via Maintenance Item:**
 
@@ -178,9 +178,9 @@ Because Addigy cannot deploy a raw `.plist` as a Custom Profile, settings must b
 The PPPC profile is a standard Apple `.mobileconfig`, which Addigy's Custom Profile feature does support directly:
 
 1. In Proximos, go to **Settings → Extras → Export Full Profile** and save `Proximos PPPC Profile.mobileconfig`.
-2. In Addigy, go to **Device Settings → New → Custom Profile**.
+2. In Addigy, go to **Catalog** → **Device Settings → New → Custom Profile**.
 3. Click **Select .mobileconfig File** and upload the `Proximos PPPC Profile.mobileconfig` file.
-4. Click **Save**.
+4. Click **Create Profile**.
 5. Assign the Device Setting to the appropriate Policies.
 
 ### Deploying the System Launch Agent
