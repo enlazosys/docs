@@ -34,17 +34,3 @@ The **Manage** button in the Proximos License Manager opens the Stripe subscript
 ## License Management
 
 License key generation, validation, and tier management are handled through a custom AWS-based system built on Stripe webhooks. When a Stripe subscription event fires (new subscription, renewal, cancellation, or upgrade), a corresponding Lambda function updates the license database, activating, renewing, or deactivating license keys automatically.
-
-## Networking
-
-If your network requires firewall or proxy allowlisting, Proximos communicates with the following Enlazo Systems domains over standard HTTPS (port 443) using TLS 1.2:
-
-| Domain | Purpose |
-| --- | --- |
-| `proximosappengine.enlazosystems.com` | Primary and secondary API endpoints for macOS update checks |
-| `proximosapplicensing.enlazosystems.com` | License key validation and licensing data |
-| `files.enlazosystems.com` | Sparkle application update checks and downloads |
-| `buy.enlazosystems.com` | HTTPS redirect for license purchases |
-| `app.link.com` | Web portal for managing and purchasing licenses |
-
-No other ports or protocols are used — all communication is standard HTTPS/TLS over port 443.

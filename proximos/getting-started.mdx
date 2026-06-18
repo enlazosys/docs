@@ -51,6 +51,21 @@ Proximos is designed to be configured once on an IT admin Mac, then deployed bro
 
 SwiftUI's `MenuBarExtra` and full app sandboxing are both goals under consideration for a potential future Proximos 2.0, but are not part of the current architecture.
 
+## Networking
+
+If your network requires firewall or proxy allowlisting, Proximos communicates with the following Enlazo Systems domains over standard HTTPS (port 443) using TLS 1.2:
+
+| Domain | Purpose |
+| :-- | :-- |
+| `proximosappengine.enlazosystems.com` | Primary and secondary API endpoints for macOS update checks |
+| `proximosapplicensing.enlazosystems.com` | License key validation and licensing data |
+| `files.enlazosystems.com` | Sparkle application update checks and downloads |
+| `buy.enlazosystems.com` | HTTPS redirect for license purchases |
+| `app.link.com` | Web portal for managing and purchasing licenses |
+| `buy.stripe.com` | Web portal for purchasing licenses |
+
+No other ports or protocols are used — all communication is standard HTTPS/TLS over port 443.
+
 ### Supported Install Locations
 
 Proximos is designed to run from any of the following locations:
