@@ -17,13 +17,13 @@ By polling GDMF continuously on a five-minute interval, the Proximos Engine has 
 
 Update data from GDMF is stored in a Proximos-managed database. The engine exposes an authenticated REST API that client Macs query during each Minor Engine run. The API accepts the device's current macOS version as a path parameter and the license key in the `Authorization` request header, returning the latest required macOS version and its Apple release date.
 
-The API includes automatic failover: Proximos clients first attempt the primary endpoint (`https://proximosappengine.enlazosystems.com/`) and fall back to a secondary AWS endpoint if the primary is unreachable or returns a 5xx error. Both endpoints query the same database and return identical data.
+The API includes automatic failover: Proximos clients first attempt the primary endpoint (`https://proximosappengine.enlazosystems.com/`) and fall back to a secondary AWS raw url endpoint if the primary is unreachable or returns a 5xx error. Both endpoints query the same database and return identical data.
 
 If the device is offline or the request times out, the engine exits without changing the license status or `LastRun` timestamp in the runtime plist, preserving the existing state until connectivity is restored.
 
 ## License Authentication
 
-License validation is handled through the API layer. Every request includes the license key in the `Authorization` header and an application key in the `AppKey` header. The database tracks which license keys are valid, their tier, and the Mac UUID of each device that has checked in. The Mac's hardware UUID is passed as a query parameter on every API call and logged in AWS CloudWatch for device count tracking — this data feeds the automated tier upgrade logic.
+License validation is handled through the API layer. The database tracks which license keys are valid, their tier, and the Mac UUID of each device that has checked in. The Mac's hardware UUID is passed as a query parameter on every API call and logged in AWS CloudWatch for device count tracking — this data feeds the automated tier upgrade logic.
 
 ## Payment Processing
 
