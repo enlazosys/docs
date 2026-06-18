@@ -43,7 +43,7 @@ Jamf Pro supports all three Proximos deployment methods for the application, set
 
 ### Deploying Proximos Settings
 
-**Option 1 — Configuration Profile (recommended):** This is the most secure and tamper-resistant approach. The settings are delivered to `/Library/Managed Preferences/` where local admins cannot delete them, ensuring Managed Mode is permanent.
+**Configuration Profile:** This is the most secure and tamper-resistant approach. The settings are delivered to `/Library/Managed Preferences/` where local admins cannot delete them, ensuring Managed Mode is permanent.
 
 1. Export your configured settings plist from **Settings → Export Settings → Export as .plist…** and save it as `com.enlazo.proximos.settings.plist`.
 2. In Jamf Pro, go to **Computers → Configuration Profiles → \+ New**.
@@ -54,15 +54,6 @@ Jamf Pro supports all three Proximos deployment methods for the application, set
 7. Set the **Preference Domain** to `com.enlazo.proximos.settings`.
 8. Go to the **Scope** tab and target the appropriate computers or smart groups.
 9. Click **Save**.
-
-**Option 2 — Settings PKG:** The `Proximos Settings.pkg` exported from **Settings → Export Settings → Export as .pkg…** installs the plist to `/Library/Preferences/`. Deploy it as a Jamf package via a Policy the same way as the application PKG above.
-
-> Note: A file in `/Library/Preferences/` can be deleted by a local administrator. See the [recommendation above](/proximos/extra-mdm-scripts#deploy-proximos-settingssh) about redeployment at check-in if using this method.
-
-**Option 3 — Settings Script:**
-
-1. Go to **Settings → Computer Management → Scripts → \+ New** and upload `Deploy Proximos Settings.sh` (with your settings values pre-filled).
-2. Deploy via a Policy with your preferred trigger and scope.
 
 ### Deploying the Proximos PPPC Profile
 
@@ -89,43 +80,58 @@ Mosyle supports script-based, package-based, and profile-based deployment for al
 
 **Option 1 — Custom Command Script (recommended):**
 
-1. In Mosyle, go to **macOS → Custom Commands → \+ Add Command**.
-2. Paste the contents of `Install or Update Proximos.sh` into the command body.
-3. Set your preferred execution frequency (e.g., **Run Once** for initial deployment, or **Run Every Time** to keep Proximos updated).
-4. Assign to the appropriate device groups under **Devices** and click **Save**.
+1. In Mosyle, go to the top **Management Tab → macOS → Custom Commands → click "Add new profile" button**.
+2. Profile Name: "Install Proximos Application"
+3. Paste the contents of `Install or Update Proximos.sh` into the Code tab body.
+4. Select the Execution Settings Tab\
+   Event - Every "Device Info" Update\
+   Schedule - Only once (Event Required)
+5. Profile Assignment\
+   Choose to assign to "All current and future Devices", a device group, or individual devices.
+6. Click the Save button
 
-**Option 2 — PKG Deployment:**
+**Option 2 — PKG Deployment:**\
+_Your Mosyle will need to have a paid tier for CDN features to upload a PKG without cloud hosting the pkg file yourself_
 
-1. Go to **macOS → Custom Packages → \+ Add Package**.
-2. Upload the Proximos `.pkg` file.
-3. Assign to the appropriate device groups and configure the installation trigger.
-4. Click **Save**.
+1. Go to **Management Tab → macOS → "Install PKG" in left sidebar (you may need to Activate this Profile Type) → PKGs Tab → Click "Add new package" button.**
+2. **Click "Already Have A .PKG"**
+3. **Choose to Automatically Set App Info and click the Next button**
+4. In the Add PKG area, Click the "Upload or Select File from CDN" button
+5. Click the blue Upload button, then Click Choose a file and select the Proximos PKG file
+6. In the Add PKG area, check the box for "This app is Signed"
+7. In the Add PKG area, Click the big "ADD ENTERPRISE APP" button
+8. Now click the "Profiles" tab while still in the "Install PKG" sidebar profile
+9. Click "Add new profile" button
+10. In the Install Apps area, Installation Source, click the "Click to add an app" button, and choose your Proximos App
+11. Advanced options - click the "Click to Edit" button
+12. Check the box to "Activate this configuration"\
+    For Auto-Install Apps, select "Install all apps after saving this profile"\
+    For Reinstall Apps, choose "Reinstall apps that have been removed"\
+    Click the "Confirm" button
+13. Profile Assignment - Assign to All current and future devices, a device group, or individual devices.
+14. Click **Save**.
 
 ### Deploying Proximos Settings
 
-**Option 1 — Custom Profile (recommended):**
-
-1. Export your configured settings from **Settings → Export Settings → Export as .plist…**.
-2. In Mosyle, go to **macOS → Profiles → \+ Add Profile → Custom Profile**.
-3. Upload your exported `com.enlazo.proximos.settings.plist` directly, or paste its XML content into the profile payload field.
-4. Set the **Preference Domain** to `com.enlazo.proximos.settings`.
-5. Assign to device groups and click **Save**.
-
 > Mosyle delivers Custom Profiles to `/Library/Managed Preferences/`, providing full Managed Mode protection that a local admin cannot remove.
 
-**Option 2 — Custom Command Script:**
+**Custom Profile:**
 
-1. Go to **macOS → Custom Commands → \+ Add Command**.
-2. Paste the contents of `Deploy Proximos Settings.sh` (with your settings values pre-filled) into the command body.
-3. Set **Run As** to **Root** and set frequency to **Run Every Time** to ensure the settings file is always present.
-4. Assign to device groups and click **Save**.
+1. Export your configured settings from **Settings → Export Settings → Export as .plist…**.
+2. In Mosyle, go to **Management → macOS → Certificates / Custom Profiles → Click "Add new profile" button.**
+3. Click the blue "Select the file" button
+4. Browse and choose to upload your exported `com.enlazo.proximos.settings.plist`
+5. Profile Assignment: Assign to all current and future devices, a device group, or individual devices.
+6. Click the **Save button**.
 
 ### Deploying the Proximos PPPC Profile
 
 1. In Proximos, go to **Settings → Extras → Export Full Profile** and save `Proximos PPPC Profile.mobileconfig`.
-2. In Mosyle, go to **macOS → Profiles → \+ Add Profile → Custom Profile**.
-3. Upload the `Proximos PPPC Profile.mobileconfig` file. Mosyle will parse the payload automatically.
-4. Assign to device groups and click **Save**.
+2. In Mosyle, go to **Management → macOS → Certificates / Custom Profiles → Click "Add new profile" button.**
+3. Click the blue "Select the file" button
+4. Browse and choose to upload your exported `Proximos PPPC Profile.mobileconfig`file.
+5. Profile Assignment: Assign to all current and future devices, a device group, or individual devices.
+6. Click the **Save button**.
 
 ### Deploying the System Launch Agent
 
