@@ -1,0 +1,50 @@
+---
+title: "Privacy"
+description: "What Proximos collects, why it collects it, and how long it's retained."
+icon: "shield"
+---
+
+## What We Store
+
+The Proximos Mac App is designed around a minimal, purposeful data model. The only device-identifying information collected is your Mac's hardware UUID, and it is collected solely to enforce your license seat count.
+
+<CardGroup cols={2}>
+  <Card title="Stored" icon="database">
+    - **Mac hardware UUID** — logged each time your Mac connects to the Proximos Engine, used to count active license seats
+    - **Connection count per UUID** — the number of times each UUID has connected within the past 30 days
+    - **License key association** — each UUID is associated with the license key it connected under
+  </Card>
+
+  <Card title="Not Stored" icon="shield-check">
+    - IP addresses
+    - Usernames or account names
+    - Hostnames or computer names
+    - macOS version or hardware model
+    - Any personally identifying information beyond the Mac hardware UUID
+  </Card>
+</CardGroup>
+
+## Why We Collect Mac UUIDs
+
+Proximos licenses are seat-based. To enforce your license's seat limit accurately and fairly, the Proximos Engine logs the hardware UUID of every Mac that connects to it. This allows Proximos to count distinct active Macs — not just API calls — against your license.
+
+No other purpose drives this collection. UUIDs are not used for analytics, marketing, or any function beyond license seat counting.
+
+## Daily License Reports
+
+A report is generated daily for each license key. It shows every Mac UUID that connected to the Proximos Engine within the past 30 days and how many times each UUID connected during that window. This report is used internally to validate seat counts and is available to you as the license holder to audit your own fleet's activity.
+
+## AWS CloudWatch
+
+Mac UUID connection events are logged to AWS CloudWatch. These logs are retained for **one year**, after which they are automatically deleted. Logs are not shared with any third party and are used solely for license seat counting and operational monitoring.
+
+## Customer Records
+
+Your customer record — including your license key, purchase history, and associated account information — is retained for **seven years** in accordance with standard business and financial recordkeeping requirements. After that period, records are purged.
+
+## Summary of Retention Periods
+
+| Data | Retention Period |
+| --- | --- |
+| Mac hardware UUID connection logs (CloudWatch) | 1 year |
+| Customer record (license, purchase history) | 7 years |
