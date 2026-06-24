@@ -1,0 +1,58 @@
+---
+title: "Jamf Pro"
+description: "Deploying Proximos, its settings, PPPC profile, and launch agents via Jamf Pro."
+icon: "computer"
+---
+
+Jamf Pro supports all three Proximos deployment methods for the application, settings, and PPPC profile. The recommended approach for most Jamf Pro environments is the **Installation Script** for the app, a **Configuration Profile** for settings (for full Managed Mode protection), and a **Configuration Profile** for the PPPC profile.
+
+## Deploying the Proximos Application
+
+**Option 1 — Installation Script (recommended):** The `Install or Update Proximos.sh` script downloads the latest Proximos DMG directly from Enlazo Systems, mounts it, copies the app to `/Applications/Utilities/`, and unmounts the DMG. It is safe to run on Macs where Proximos is already installed — it will update to the latest version.
+
+1. In Jamf Pro, go to **Settings → Computer Management → Scripts → \+ New**.
+2. On the **General** tab, give the script a name (e.g., "Install Proximos").
+3. On the **Script** tab, paste the contents of `Install or Update Proximos.sh` from the MDM Scripts bundle.
+4. Click **Save**.
+5. Go to **Computers → Policies → \+ New**.
+6. On the **General** tab, set a display name and configure your preferred trigger (e.g., **Enrollment Complete**, **Recurring Check-in**, or **Self Service**).
+7. Go to the **Scripts** payload, click **Configure**, and add your script.
+8. Go to the **Scope** tab and target the appropriate computers or smart groups.
+9. Click **Save**.
+
+**Option 2 — PKG Deployment:** If you have a Proximos `.pkg` installer provided by Enlazo Systems:
+
+1. Go to **Settings → Computer Management → Packages → \+ New**.
+2. Upload the Proximos `.pkg` file and click **Save**.
+3. Go to **Computers → Policies → \+ New**, add the package via the **Packages** payload, scope it, and save.
+
+> The installation script is generally preferred over the PKG for Proximos because it always pulls the latest version from Enlazo Systems, ensuring your fleet stays current without requiring a new package upload for each Proximos update.
+
+## Deploying Proximos Settings
+
+**Configuration Profile:** This is the most secure and tamper-resistant approach. The settings are delivered to `/Library/Managed Preferences/` where local admins cannot delete them, ensuring Managed Mode is permanent.
+
+1. Export your configured settings plist from **Settings → Export Settings → Export as .plist…** and save it as `com.enlazo.proximos.settings.plist`.
+2. In Jamf Pro, go to **Computers → Configuration Profiles → \+ New**.
+3. On the **General** tab, give the profile a name (e.g., "Proximos Settings").
+4. Click **Application & Custom Settings** in the left payload list.
+5. Click **\+ Add**, then set **Source** to **Upload**.
+6. Click **Choose File** and select your exported `com.enlazo.proximos.settings.plist` file.
+7. Set the **Preference Domain** to `com.enlazo.proximos.settings`.
+8. Go to the **Scope** tab and target the appropriate computers or smart groups.
+9. Click **Save**.
+
+## Deploying the Proximos PPPC Profile
+
+The Full PPPC Profile authorizes Proximos, its bundled notifier, and the Nudge LaunchAgent to function with full system permissions. This profile must be deployed for notifications and enforcement to work correctly.
+
+1. In Proximos, go to **Settings → Extras → Proximos PPPC Profiles → Export Full Profile** and save `Proximos PPPC Profile.mobileconfig`.
+2. In Jamf Pro, go to **Computers → Configuration Profiles → \+ New**.
+3. On the **General** tab, give the profile a name (e.g., "Proximos PPPC Profile").
+4. Click **Upload** (in the upper right of the profile editor) and select the `Proximos PPPC Profile.mobileconfig` file. Jamf Pro will parse and import all payloads from the mobileconfig automatically.
+5. Go to the **Scope** tab and target the appropriate computers or smart groups.
+6. Click **Save**.
+
+## Deploying the System Launch Agent
+
+Deploy the Standard or Headless Launch Agent PKG (generated from **Settings → Extras**) as a Jamf package via a Policy, or upload and run the corresponding deployment script. See [About the System Launch Agent](/proximos/mdm-deployment#about-the-system-launch-agent-and-system-headless-launch-agent) for guidance on which to choose.
