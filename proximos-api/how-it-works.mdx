@@ -52,6 +52,10 @@ The database uses a DynamoDB composite key called `board_id_major_version` (e.g.
 
 Point releases (e.g., `J293AP:14.7.2`) are stored as individual rows as well, enabling the [GET by BoardID:Version](/proximos-api/endpoints/get-boardid-version) endpoint to find the next available update from any specific version.
 
+## Best Response Performance
+
+Using a primary key lookup [GET by BoardID:Version](/proximos-api/endpoints/get-boardid-version) will provide the fastest API response times. If possible, extract a Mac Board ID with shell command`ioreg -l | grep board-id `and use it in your API call. 
+
 ## Board ID coverage
 
 The `J293AP` (M1 MacBook Pro) is used as the canonical representative board for version-only lookups covering macOS 11 through the latest release. For older macOS versions, progressively older Mac models are used to fill in coverage. For Classic Mac OS and early Mac OS X, processor type identifiers (`G3`, `G4`, `PowerPC`, `68040`, etc.) serve as the board ID.
