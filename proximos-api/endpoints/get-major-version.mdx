@@ -1,0 +1,110 @@
+---
+title: "GET /items/{majorVersion}"
+description: "Look up the latest macOS release for a given major version number."
+icon: "arrow-down-to-line"
+---
+
+Returns the latest known point release and its release date for the given macOS major version. No board ID is required — the API resolves the record using a canonical representative Mac for that era.
+
+## Endpoint
+
+```http
+GET https://proximosapi.enlazosystems.com/items/{majorVersion}
+Authorization: YOUR_DECODED_LICENSE_KEY
+```
+
+## Path Parameter
+
+<ParamField path="majorVersion" type="string" required>
+  The macOS major version number.
+
+  | Era | Format | Examples |
+  | --- | --- | --- |
+  | Modern macOS (11\+) | Single integer | `14`, `15`, `26` |
+  | macOS 10.x | Two-part (`10.Y`) | `10.15`, `10.14`, `10.9` |
+  | Classic Mac OS | Two-part (`X.Y`) | `8.5`, `9.2`, `7.5` |
+  | System 0.97 | As-is | `0.97` |
+</ParamField>
+
+## Example Requests
+
+<CodeGroup>
+
+```bash Modern macOS
+curl -H "Authorization: YOUR_DECODED_LICENSE_KEY" \
+  https://proximosapi.enlazosystems.com/items/26
+```
+
+```bash macOS 10.x
+curl -H "Authorization: YOUR_DECODED_LICENSE_KEY" \
+  https://proximosapi.enlazosystems.com/items/10.15
+```
+
+```bash Classic Mac OS
+curl -H "Authorization: YOUR_DECODED_LICENSE_KEY" \
+  https://proximosapi.enlazosystems.com/items/8.5
+```
+
+</CodeGroup>
+
+## Responses
+
+### Modern macOS (11\+)
+
+```json
+[
+  {
+    "major_version": "26",
+    "board_id_major_version": "J293AP:26",
+    "releasedDate": "2026-06-01",
+    "version": "26.5.1",
+    "resolved_board_id": "J293AP"
+  }
+]
+```
+
+### Classic Mac OS (System 0.97 – Mac OS 9.2.2)
+
+```json
+[
+  {
+    "major_version": 8.5,
+    "board_id_major_version": "G3:8.5",
+    "releasedDate": "1998-11-10",
+    "version": "8.5.1",
+    "resolved_board_id": "G3"
+  }
+]
+```
+
+## Response Fields
+
+<ResponseField name="major_version" type="string | number">
+  The macOS major version. A string for modern macOS; a number for Classic Mac OS.
+</ResponseField>
+
+<ResponseField name="board_id_major_version" type="string">
+  The internal DynamoDB composite key: `{board_id}:{major_version}`.
+</ResponseField>
+
+<ResponseField name="releasedDate" type="string">
+  Release date of the latest point release for this major version, in `YYYY-MM-DD` format.
+</ResponseField>
+
+<ResponseField name="version" type="string">
+  The latest known point release for this major version.
+</ResponseField>
+
+<ResponseField name="resolved_board_id" type="string">
+  The board ID used to resolve this record. This is a canonical representative Mac for the era:
+
+  - Modern macOS (11\+): `J293AP` (M1 MacBook Pro)
+  - macOS 10.0–10.5: `PowerPC`
+  - macOS 10.6–10.15: Intel board IDs (e.g. `Mac-F4208EAA`)
+  - Classic Mac OS: processor model (e.g. `G3`, `68040`)
+</ResponseField>
+
+## Notes
+
+- Passing a full point release (e.g. `14.7.2`) to this endpoint will still return the **latest** release for that major version, not the specific version you passed. To look up a specific point release, use [GET /items/](/proximos-api/endpoints/get-boardid-version){boardID}[:](/proximos-api/endpoints/get-boardid-version){version}.
+- The response is always an array containing one item.

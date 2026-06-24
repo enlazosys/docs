@@ -74,6 +74,10 @@
             ]
           }
         ]
+      },
+      {
+        "product": "Proximos API",
+        "href": "/proximos-api/overview"
       }
     ]
   },

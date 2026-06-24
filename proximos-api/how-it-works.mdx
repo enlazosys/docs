@@ -1,0 +1,57 @@
+---
+title: "How Does the Proximos API Work?"
+description: "AWS Lambda-powered, polling Apple's GDMF every five minutes for new macOS releases."
+icon: "gear"
+---
+
+## Architecture
+
+The Proximos API runs entirely on AWS infrastructure:
+
+<CardGroup cols={2}>
+  <Card title="AWS Lambda" icon="bolt">
+    Handles all request routing, database lookups, and response formatting for every API call.
+  </Card>
+
+  <Card title="AWS API Gateway" icon="shield-check">
+    Manages HTTPS endpoints and validates every license key before forwarding requests.
+  </Card>
+
+  <Card title="Amazon DynamoDB" icon="database">
+    Stores the macOS version database (primary and legacy tables) plus the license key authorization table.
+  </Card>
+
+  <Card title="AWS CloudWatch" icon="chart-line">
+    Logs API activity: request counts per license key and the query data requested.
+  </Card>
+</CardGroup>
+
+## Staying current
+
+The Proximos API polls Apple's [GDMF (General Device Management Framework)](https://gdmf.apple.com/v2/pmv) endpoint every **five minutes** for new macOS releases. When Apple publishes a new version, it is added to the database automatically — no manual intervention required.
+
+The Proximos API is typically updated within minutes of Apple publishing a new macOS release.
+
+## Request flow
+
+1. Your client sends a `GET` request to `proximosapi.enlazosystems.com/items/{query}` with your license key in the `Authorization` header.
+2. AWS API Gateway validates the license key against the authorization database.
+3. If authorized, the Lambda function is invoked and queries DynamoDB for the matching record.
+4. The result is returned as a JSON response.
+
+## Database structure
+
+The database uses a DynamoDB composite key called `board_id_major_version` (e.g., `J293AP:14`). Each summary record stores:
+
+| Field | Example | Description |
+| --- | --- | --- |
+| `board_id_major_version` | `J293AP:14` | Primary key: board ID \+ colon \+ major version |
+| `major_version` | `14` | The macOS major version number |
+| `version` | `14.8.7` | Latest known point release for this board/major |
+| `releasedDate` | `2026-05-11` | Release date of the latest point release |
+
+Point releases (e.g., `J293AP:14.7.2`) are stored as individual rows as well, enabling the [GET by BoardID:Version](/proximos-api/endpoints/get-boardid-version) endpoint to find the next available update from any specific version.
+
+## Board ID coverage
+
+The `J293AP` (M1 MacBook Pro) is used as the canonical representative board for version-only lookups covering macOS 11 through the latest release. For older macOS versions, progressively older Mac models are used to fill in coverage. For Classic Mac OS and early Mac OS X, processor type identifiers (`G3`, `G4`, `PowerPC`, `68040`, etc.) serve as the board ID.

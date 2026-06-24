@@ -1,0 +1,102 @@
+---
+title: "GET /items/{boardID}"
+description: "Retrieve all macOS major versions supported by a given board ID."
+icon: "microchip"
+---
+
+Returns a comma-separated list of every macOS major version that the specified board ID (Mac model) has ever supported. Useful for quickly checking what macOS versions a given Mac is compatible with.
+
+## Endpoint
+
+```http
+GET https://proximosapi.enlazosystems.com/items/{boardID}
+Authorization: YOUR_DECODED_LICENSE_KEY
+```
+
+## Path Parameter
+
+<ParamField path="boardID" type="string" required>
+  The Apple internal board identifier for the Mac model. Must start with a letter and contain no periods or colons.
+
+  | Era | Example board IDs |
+  | --- | --- |
+  | Apple Silicon | `J293AP`, `J413AP`, `J316cAP`, `J493AP` |
+  | Intel | `Mac-35C5E08120C7EEAF`, `Mac-4B682C642B45593E` |
+  | PowerPC (macOS 10.0–10.5) | `PowerPC` |
+  | Classic Mac OS | `G3`, `G4`, `68040`, `68030`, `68000` |
+  | Virtual machines | `VMA2MACOSAP`, `VMM-x86_64` |
+</ParamField>
+
+## Example Requests
+
+<CodeGroup>
+
+```bash cURL
+curl -H "Authorization: YOUR_DECODED_LICENSE_KEY" \
+  https://proximosapi.enlazosystems.com/items/J293AP
+```
+
+```python Python
+import requests
+
+response = requests.get(
+    "https://proximosapi.enlazosystems.com/items/J293AP",
+    headers={"Authorization": "YOUR_DECODED_LICENSE_KEY"}
+)
+print(response.json())
+```
+
+```javascript JavaScript
+const response = await fetch(
+  "https://proximosapi.enlazosystems.com/items/J293AP",
+  { headers: { "Authorization": "YOUR_DECODED_LICENSE_KEY" } }
+);
+const data = await response.json();
+console.log(data);
+```
+
+</CodeGroup>
+
+## Response
+
+```json
+{
+  "board_id": "J293AP",
+  "supported_macOS": "11.0, 12.0, 13.0, 14.0, 15.0, 26.0"
+}
+```
+
+## Response Fields
+
+<ResponseField name="board_id" type="string">
+  The board ID from the request path.
+</ResponseField>
+
+<ResponseField name="supported_macOS" type="string">
+  A comma-separated, version-sorted list of every macOS major version supported by this board ID.
+
+  Each version is formatted as `X.0` (e.g. `14.0`, `26.0`) for modern macOS. Classic Mac OS entries are formatted as-is (e.g. `8.5`, `9.2`).
+</ResponseField>
+
+## Notes
+
+- The API returns a `404` if no records are found for the given board ID.
+- Major versions are sorted in ascending order.
+- Results are sourced from both the primary and legacy DynamoDB tables.
+- To look up the latest release for a specific major version on this board, use [GET /items/](/proximos-api/endpoints/get-boardid-major){boardID}[:](/proximos-api/endpoints/get-boardid-major){majorVersion}.
+
+## Finding Your Mac's Board ID
+
+You can find a Mac's board ID from the command line:
+
+```bash
+ioReg -d2 -c IOPlatformExpertDevice | grep board-id
+```
+
+Or from a shell script in MDM:
+
+```bash
+board_id=$(ioreg -d2 -c IOPlatformExpertDevice | awk -F'"' '/board-id/{print $4}')
+curl -H "Authorization: YOUR_DECODED_LICENSE_KEY" \
+  "https://proximosapi.enlazosystems.com/items/${board_id}"
+```

@@ -1,0 +1,89 @@
+---
+title: "Authentication"
+description: "All Proximos API requests require your decoded license key in the Authorization header."
+icon: "key"
+---
+
+## Overview
+
+Every request to the Proximos API must include your license key as the value of the `Authorization` HTTP header. The key must be decoded from base64 before use.
+
+```http
+GET /items/26 HTTP/1.1
+Host: proximosapi.enlazosystems.com
+Authorization: YOUR_DECODED_LICENSE_KEY
+```
+
+## Decoding Your License Key
+
+After purchasing, your license key is emailed to your payment email address. **The key is delivered base64-encoded** and must be decoded before it can be used in the header.
+
+<Tabs>
+  <Tab title="Terminal">
+    Run the following in Terminal on macOS or Linux, replacing the placeholder with the key from your email:
+
+    ```bash
+    echo "base64EncodedKeyFromEmail" | base64 -d
+    ```
+
+    The decoded key will be printed to the terminal and look something like: `OTRQ-W7RO-KE3N-W1HG`
+  </Tab>
+  <Tab title="Web">
+    Visit [https://base64decode.net](https://base64decode.net), paste the base64 key from your email into the input field, and click **Decode**.
+  </Tab>
+</Tabs>
+
+<Warning>
+  Always use the **decoded** key in your `Authorization` header. Sending the raw base64 string from your email will result in a `403 Unauthorized` response.
+</Warning>
+
+## Example Requests
+
+<CodeGroup>
+
+```bash cURL
+curl -H "Authorization: YOUR_DECODED_LICENSE_KEY" \
+  https://proximosapi.enlazosystems.com/items/26
+```
+
+```python Python
+import requests
+
+response = requests.get(
+    "https://proximosapi.enlazosystems.com/items/26",
+    headers={"Authorization": "YOUR_DECODED_LICENSE_KEY"}
+)
+print(response.json())
+```
+
+```javascript JavaScript
+const response = await fetch("https://proximosapi.enlazosystems.com/items/26", {
+  headers: {
+    "Authorization": "YOUR_DECODED_LICENSE_KEY"
+  }
+});
+const data = await response.json();
+console.log(data);
+```
+
+```swift Swift
+var request = URLRequest(url: URL(string: "https://proximosapi.enlazosystems.com/items/26")!)
+request.setValue("YOUR_DECODED_LICENSE_KEY", forHTTPHeaderField: "Authorization")
+
+let (data, _) = try await URLSession.shared.data(for: request)
+let json = try JSONSerialization.jsonObject(with: data)
+print(json)
+```
+
+</CodeGroup>
+
+## Authorization Responses
+
+| HTTP Status | Meaning |
+| --- | --- |
+| `200 OK` | Authorized — response body contains your requested data |
+| `403 Forbidden` | Unauthorized — missing, invalid, or undecoded (still base64) license key |
+
+## Lost License Key
+
+If you have lost your license key, visit the [Proximos API website](https://enlazosystems.com/proximos-api/purchase) to request it be re-sent. It will be emailed automatically to your original payment email address.

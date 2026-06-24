@@ -1,0 +1,147 @@
+---
+title: "GET /items/{boardID}:{version}"
+description: "Look up a specific version for a board ID, including the next available update."
+icon: "circle-arrow-right"
+---
+
+This is the most detailed endpoint. Given a board ID and a specific point release, it returns:
+
+1. The **latest release** currently available for that board/major version pair
+2. The **release date of the version you requested**
+3. The **version proximo** — the next update available after the version you specified
+
+This is the endpoint used internally by the Proximos app to determine what update a Mac on a specific version should be moved to next.
+
+## Endpoint
+
+```http
+GET https://proximosapi.enlazosystems.com/items/{boardID}:{version}
+Authorization: YOUR_DECODED_LICENSE_KEY
+```
+
+## Path Parameters
+
+<ParamField path="boardID" type="string" required>
+  The Apple internal board identifier for the Mac model.
+
+  | Era | Example board IDs |
+  | --- | --- |
+  | Apple Silicon | `J293AP`, `J413AP`, `J316cAP` |
+  | Intel | `Mac-35C5E08120C7EEAF`, `Mac-4B682C642B45593E` |
+  | PowerPC (macOS 10.0–10.5) | `PowerPC` |
+  | Classic Mac OS | `G3`, `G4`, `68040`, `68030`, `68000` |
+</ParamField>
+
+<ParamField path="version" type="string" required>
+  A full macOS point release version string — must include at least three components.
+
+  | Era | Format | Examples |
+  | --- | --- | --- |
+  | Modern macOS | `X.Y.Z` | `14.7.2`, `15.3.1`, `26.5.1` |
+  | macOS 10.x | `10.Y.Z` | `10.15.7`, `10.14.6` |
+  | Classic Mac OS | `X.Y.Z` | `8.5.1`, `9.2.2` |
+
+  <Note>
+    Passing a major-only version (e.g. `14`) or a two-part version (e.g. `J293AP:14`) to this endpoint will return a shorter response without the proximo fields. Use [GET /items/](/proximos-api/endpoints/get-boardid-major){boardID}[:](/proximos-api/endpoints/get-boardid-major){majorVersion} for that case.
+  </Note>
+</ParamField>
+
+## Example Requests
+
+<CodeGroup>
+
+```bash cURL
+curl -H "Authorization: YOUR_DECODED_LICENSE_KEY" \
+  https://proximosapi.enlazosystems.com/items/J293AP:14.7.2
+```
+
+```python Python
+import requests
+
+response = requests.get(
+    "https://proximosapi.enlazosystems.com/items/J293AP:14.7.2",
+    headers={"Authorization": "YOUR_DECODED_LICENSE_KEY"}
+)
+print(response.json())
+```
+
+```javascript JavaScript
+const response = await fetch(
+  "https://proximosapi.enlazosystems.com/items/J293AP:14.7.2",
+  { headers: { "Authorization": "YOUR_DECODED_LICENSE_KEY" } }
+);
+const data = await response.json();
+console.log(data);
+```
+
+</CodeGroup>
+
+## Response
+
+```json
+[
+  {
+    "major_version": "14",
+    "board_id_major_version": "J293AP:14",
+    "releasedDate": "2026-05-11",
+    "version": "14.8.7",
+    "resolved_board_id": "J293AP",
+    "requested_version": "14.7.2",
+    "requested_releasedDate": "2024-12-11",
+    "requested_version_proximo": "14.7.3",
+    "requested_version_proximo_releasedDate": "2025-01-27"
+  }
+]
+```
+
+## Response Fields
+
+<ResponseField name="major_version" type="string">
+  The major version of macOS for this record.
+</ResponseField>
+
+<ResponseField name="board_id_major_version" type="string">
+  The internal DynamoDB composite key: `{boardID}:{major_version}`.
+</ResponseField>
+
+<ResponseField name="releasedDate" type="string">
+  Release date of the **latest** available point release for this board/major, in `YYYY-MM-DD` format.
+</ResponseField>
+
+<ResponseField name="version" type="string">
+  The **latest** available point release version for this board/major.
+</ResponseField>
+
+<ResponseField name="resolved_board_id" type="string">
+  The board ID from the request path.
+</ResponseField>
+
+<ResponseField name="requested_version" type="string">
+  The specific version you passed in the request path.
+</ResponseField>
+
+<ResponseField name="requested_releasedDate" type="string">
+  The release date of the version you requested, in `YYYY-MM-DD` format.
+</ResponseField>
+
+<ResponseField name="requested_version_proximo" type="string">
+  The **next available update** after the version you requested — the "version proximo."
+
+  If the version you requested is already the latest for this major, this will equal `version` (the latest).
+</ResponseField>
+
+<ResponseField name="requested_version_proximo_releasedDate" type="string">
+  The release date of the version proximo, in `YYYY-MM-DD` format.
+</ResponseField>
+
+## Understanding the Version Proximo
+
+The version proximo is the **immediate next release** after the version you queried — not necessarily the latest. For example, if you query `J293AP:14.7.2`:
+
+| Field | Value | Meaning |
+| --- | --- | --- |
+| `requested_version` | `14.7.2` | The version you asked about |
+| `requested_version_proximo` | `14.7.3` | The very next release after 14.7.2 |
+| `version` | `14.8.7` | The latest release on the 14.x branch |
+
+This makes it easy to walk a Mac through updates incrementally, one release at a time.
