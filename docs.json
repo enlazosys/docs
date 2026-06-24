@@ -83,17 +83,11 @@
             "groups": [
               {
                 "group": "Overview",
-                "icon": "book-open",
+                "icon": "folder",
                 "pages": [
-                  "proximos-api/overview",
                   "proximos-api/why",
-                  "proximos-api/how-it-works"
-                ]
-              },
-              {
-                "group": "Getting Started",
-                "icon": "rocket",
-                "pages": [
+                  "proximos-api/overview",
+                  "proximos-api/how-it-works",
                   "proximos-api/licensing",
                   "proximos-api/privacy",
                   "proximos-api/authentication"
