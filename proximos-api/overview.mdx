@@ -1,0 +1,45 @@
+---
+title: "What is the Proximos API?"
+description: "A complete HTTP GET API covering every macOS release in history — from System 0.97 to today."
+icon: "circle-question-mark"
+---
+
+The Proximos API is a simple, read-only HTTP GET API that gives you programmatic access to the **complete history of macOS releases** — from Classic Mac System 0.97 on the original Mac 128k all the way to the latest macOS releases today.
+
+Use it to build custom private workflows around macOS release dates, version history, and compatible hardware identifiers (board IDs).
+
+## What you can look up
+
+- **The latest release** for any macOS major version number
+- **The latest update available** for a specific Mac model (board ID) on a given major version
+- **The next available update** from a specific version — the _version proximo_
+- **All compatible board IDs** for a given macOS version
+- **All supported macOS versions** for a specific board ID
+
+## Base URL
+
+All requests are HTTPS GET requests to:
+
+```text
+https://proximosapi.enlazosystems.com
+```
+
+## Coverage
+
+<CardGroup cols={2}>
+  <Card title="Classic Mac OS" icon="desktop">
+    **System 0.97 – Mac OS 9.2.2**
+
+    Board IDs are returned as processor model names: `68000`, `68020`, `68030`, `68040`, `G3`, `G4`.
+  </Card>
+
+  <Card title="Mac OS X & macOS" icon="apple">
+    **Mac OS X 10.0 – latest macOS**
+
+    PowerPC Macs (10.0–10.5) return `PowerPC` as the board ID. Intel and Apple Silicon Macs return Apple's internal board ID strings (e.g. `J293AP`).
+  </Card>
+</CardGroup>
+
+<Card title="Purchase a License" icon="credit-card" href="https://enlazosystems.com/proximos-api/purchase">
+  30-day free trial · $9.99/month standard · $6.99/month educational
+</Card>

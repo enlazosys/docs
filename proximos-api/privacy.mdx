@@ -1,0 +1,31 @@
+---
+title: "Privacy"
+description: "No connection or device identifying information is stored."
+icon: "shield"
+---
+
+## What We Store
+
+The Proximos API is designed with minimal data retention. No connection or device-identifying information is collected.
+
+<CardGroup cols={2}>
+  <Card title="Stored" icon="database">
+    - **Request count per license key** — used for fair-use limit enforcement
+    - **Queried endpoint and parameters** — logged to AWS CloudWatch for operational monitoring
+  </Card>
+
+  <Card title="Not Stored" icon="shield-check">
+    - IP addresses
+    - Device identifiers or MAC addresses
+    - User-agent strings
+    - Any personally identifying information beyond your license key
+  </Card>
+</CardGroup>
+
+## AWS CloudWatch
+
+API activity is logged in AWS CloudWatch for operational monitoring, abuse detection, and fair-use enforcement. These logs are retained according to standard AWS CloudWatch retention policies and are not shared with third parties.
+
+## License Key Storage
+
+Your license key is stored in an AWS DynamoDB table solely to authorize API requests. It is not used for any other purpose and is not shared with any third party.

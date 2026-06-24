@@ -1,0 +1,125 @@
+---
+title: "GET /items/{version}/board_ids"
+description: "Retrieve all compatible board IDs for a given macOS version."
+icon: "list"
+---
+
+Returns a sorted list of every board ID (Mac model) that is compatible with the given macOS version. Accepts both specific point releases and major version numbers.
+
+## Endpoint
+
+```http
+GET https://proximosapi.enlazosystems.com/items/{version}/board_ids
+Authorization: YOUR_DECODED_LICENSE_KEY
+```
+
+## Path Parameter
+
+<ParamField path="version" type="string" required>
+  A macOS version string. Can be a full point release or a major-only version.
+
+  | Input | Behavior |
+  | --- | --- |
+  | `12.3.2` | Returns board IDs for macOS 12 (major is inferred) |
+  | `12` | Same result — major version is used to find all compatible boards |
+  | `10.15.7` | Returns board IDs for macOS 10.15 |
+  | `8.5` | Returns processor IDs for Classic Mac OS 8.5 |
+</ParamField>
+
+## Example Requests
+
+<CodeGroup>
+
+```bash Specific point release
+curl -H "Authorization: YOUR_DECODED_LICENSE_KEY" \
+  https://proximosapi.enlazosystems.com/items/12.3.2/board_ids
+```
+
+```bash Major version only
+curl -H "Authorization: YOUR_DECODED_LICENSE_KEY" \
+  https://proximosapi.enlazosystems.com/items/26/board_ids
+```
+
+```bash macOS 10.x
+curl -H "Authorization: YOUR_DECODED_LICENSE_KEY" \
+  https://proximosapi.enlazosystems.com/items/10.15/board_ids
+```
+
+</CodeGroup>
+
+## Response
+
+```json
+{
+  "macos_version": "12.3.2",
+  "major_version": "12",
+  "compatible_board_ids": [
+    "J132AP",
+    "J137AP",
+    "J140AAP",
+    "J140KAP",
+    "J152FAP",
+    "J160AP",
+    "J174AP",
+    "J185AP",
+    "J185FAP",
+    "J213AP",
+    "J214KAP",
+    "J215AP",
+    "J223AP",
+    "J230KAP",
+    "J274AP",
+    "J293AP",
+    "J313AP",
+    "J314cAP",
+    "J314sAP",
+    "J316cAP",
+    "J316sAP",
+    "J375cAP",
+    "J375dAP",
+    "J413AP",
+    "J456AP",
+    "J457AP",
+    "J493AP",
+    "J680AP",
+    "J780AP",
+    "Mac-06F11F11946D27C5",
+    "Mac-06F11FD93F0323C5",
+    "...",
+    "VMA2MACOSAP",
+    "VMM-x86_64"
+  ],
+  "count": 58
+}
+```
+
+## Response Fields
+
+<ResponseField name="macos_version" type="string">
+  The version string as provided in the request path.
+</ResponseField>
+
+<ResponseField name="major_version" type="string">
+  The inferred major version (e.g. `"12"` from `"12.3.2"`).
+</ResponseField>
+
+<ResponseField name="compatible_board_ids" type="array of strings">
+  A sorted list of every board ID (Apple internal hardware identifier) that supports this macOS major version.
+
+  Board ID formats vary by Mac era:
+
+  - **Apple Silicon & Intel (modern)**: `J293AP`, `Mac-35C5E08120C7EEAF`, etc.
+  - **Virtual machines**: `VMA2MACOSAP`, `VMM-x86_64`
+  - **PowerPC Mac OS X**: `PowerPC`
+  - **Classic Mac OS**: processor models (`G3`, `G4`, `68040`, `68030`, `68000`)
+</ResponseField>
+
+<ResponseField name="count" type="integer">
+  The total number of board IDs in the `compatible_board_ids` array.
+</ResponseField>
+
+## Notes
+
+- Results are sourced from both the primary and legacy DynamoDB tables and merged into a single unified list. This ensures full coverage for older macOS versions.
+- Board IDs are sorted alphabetically.
+- A `404` is returned if no board IDs are found for the specified version.

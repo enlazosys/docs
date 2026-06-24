@@ -1,0 +1,31 @@
+---
+title: "Why Does the Proximos API Exist?"
+description: "Built internally for the Proximos app — and opened up for everyone."
+icon: "lightbulb"
+---
+
+## Built for Proximos, opened to all
+
+The Proximos API was built internally to power the [Proximos app](/) — a macOS software update enforcement tool for Mac admins. We needed a fast, reliable, cloud-hosted way to query the full macOS release history and board ID compatibility, so we built one.
+
+Once built, we thought other admins and developers might find it useful for their own scripts, workflows, and tools — so we released it as a licensed HTTP API.
+
+The Proximos API uses a separate, standalone API route and macOS Version Database from the Proximos Application.
+
+## What about the MacAdmins SOFA project?
+
+We genuinely admire the [SOFA project](https://sofa.macadmins.io/) from the Mac Admins community. SOFA is an excellent community resource for macOS and iOS update data.
+
+The Proximos API and SOFA serve different use cases:
+
+|  | SOFA | Proximos API |
+| --- | --- | --- |
+| Format | Static JSON file | HTTP GET API |
+| Delivery | Hosted file download | Structured REST endpoint |
+| macOS history | Modern macOS | Every macOS since System 0.97 |
+| Specific point-release lookup | ✖ | ✔ |
+| Next available update from a version | ✖ | ✔ |
+| Board ID → supported macOS versions | ✖ | ✔ |
+| Version → compatible board IDs | ✔ | ✔ |
+
+SOFA is a JSON file you download and parse yourself. The Proximos API is a structured HTTP API — you request exactly what you need and get back exactly what you asked for.

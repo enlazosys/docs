@@ -74,6 +74,40 @@
             ]
           }
         ]
+      },
+      {
+        "product": "Proximos API",
+        "tabs": [
+          {
+            "tab": "Documentation",
+            "groups": [
+              {
+                "group": "Overview",
+                "icon": "folder",
+                "pages": [
+                  "proximos-api/why",
+                  "proximos-api/overview",
+                  "proximos-api/how-it-works",
+                  "proximos-api/licensing",
+                  "proximos-api/privacy",
+                  "proximos-api/authentication"
+                ]
+              },
+              {
+                "group": "API Reference",
+                "icon": "code",
+                "pages": [
+                  "proximos-api/endpoints/get-major-version",
+                  "proximos-api/endpoints/get-board-ids",
+                  "proximos-api/endpoints/get-boardid-version",
+                  "proximos-api/endpoints/get-boardid-major",
+                  "proximos-api/endpoints/get-boardid"
+                ]
+              }
+            ]
+          }
+        ],
+        "description": "HTTP API for macOS release history and board ID compatibility."
       }
     ]
   },
