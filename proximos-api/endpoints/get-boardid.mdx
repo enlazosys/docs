@@ -90,10 +90,10 @@ console.log(data);
 You can find a Mac's board ID from the command line:
 
 ```bash
-ioReg -d2 -c IOPlatformExpertDevice | grep board-id
+ioreg -d2 -c IOPlatformExpertDevice | grep board-id
 ```
 
-Or from a shell script in MDM:
+Or use it in an MDM script:
 
 ```bash
 board_id=$(ioreg -d2 -c IOPlatformExpertDevice | awk -F'"' '/board-id/{print $4}')
