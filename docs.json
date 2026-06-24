@@ -63,7 +63,17 @@
               {
                 "group": "Deployment & Administration",
                 "pages": [
-                  "proximos/mdm-deployment",
+                  {
+                    "group": "MDM Deployment",
+                    "icon": "computer",
+                    "pages": [
+                      "proximos/mdm-deployment",
+                      "proximos/mdm-jamf-pro",
+                      "proximos/mdm-mosyle",
+                      "proximos/mdm-addigy",
+                      "proximos/mdm-jumpcloud"
+                    ]
+                  },
                   "proximos/removal",
                   "proximos/settings-overview",
                   "proximos/default-settings-reference",

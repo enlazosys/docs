@@ -14,217 +14,25 @@ Proximos is built for MDM-managed environments. The recommended deployment flow 
 
 When a settings file exists at `/Library/Managed Preferences/com.enlazo.proximos.settings.plist` or `/Library/Preferences/com.enlazo.proximos.settings.plist`, Proximos enters **Managed Mode**. In Managed Mode, users cannot access the Settings or License Manager windows, and the Quit menu option is hidden from the menu bar.
 
----
+Select your MDM platform for step-by-step deployment instructions:
 
-## Deployment in Jamf Pro
+<CardGroup cols={2}>
+  <Card title="Jamf Pro" icon="computer" href="/proximos/mdm-jamf-pro">
+    Script, PKG, and Configuration Profile deployment for the app, settings, PPPC profile, and launch agents.
+  </Card>
 
-Jamf Pro supports all three Proximos deployment methods for the application, settings, and PPPC profile. The recommended approach for most Jamf Pro environments is the **Installation Script** for the app, a **Configuration Profile** for settings (for full Managed Mode protection), and a **Configuration Profile** for the PPPC profile.
+  <Card title="Mosyle" icon="computer" href="/proximos/mdm-mosyle">
+    Custom Command, PKG, and Custom Profile deployment for the app, settings, PPPC profile, and launch agents.
+  </Card>
 
-### Deploying the Proximos Application
+  <Card title="Addigy" icon="computer" href="/proximos/mdm-addigy">
+    Smart Software, Maintenance Item, and Custom Profile deployment for the app, settings, PPPC profile, and launch agents.
+  </Card>
 
-**Option 1 — Installation Script (recommended):** The `Install or Update Proximos.sh` script downloads the latest Proximos DMG directly from Enlazo Systems, mounts it, copies the app to `/Applications/Utilities/`, and unmounts the DMG. It is safe to run on Macs where Proximos is already installed — it will update to the latest version.
-
-1. In Jamf Pro, go to **Settings → Computer Management → Scripts → \+ New**.
-2. On the **General** tab, give the script a name (e.g., "Install Proximos").
-3. On the **Script** tab, paste the contents of `Install or Update Proximos.sh` from the MDM Scripts bundle.
-4. Click **Save**.
-5. Go to **Computers → Policies → \+ New**.
-6. On the **General** tab, set a display name and configure your preferred trigger (e.g., **Enrollment Complete**, **Recurring Check-in**, or **Self Service**).
-7. Go to the **Scripts** payload, click **Configure**, and add your script.
-8. Go to the **Scope** tab and target the appropriate computers or smart groups.
-9. Click **Save**.
-
-**Option 2 — PKG Deployment:** If you have a Proximos `.pkg` installer provided by Enlazo Systems:
-
-1. Go to **Settings → Computer Management → Packages → \+ New**.
-2. Upload the Proximos `.pkg` file and click **Save**.
-3. Go to **Computers → Policies → \+ New**, add the package via the **Packages** payload, scope it, and save.
-
-> The installation script is generally preferred over the PKG for Proximos because it always pulls the latest version from Enlazo Systems, ensuring your fleet stays current without requiring a new package upload for each Proximos update.
-
-### Deploying Proximos Settings
-
-**Configuration Profile:** This is the most secure and tamper-resistant approach. The settings are delivered to `/Library/Managed Preferences/` where local admins cannot delete them, ensuring Managed Mode is permanent.
-
-1. Export your configured settings plist from **Settings → Export Settings → Export as .plist…** and save it as `com.enlazo.proximos.settings.plist`.
-2. In Jamf Pro, go to **Computers → Configuration Profiles → \+ New**.
-3. On the **General** tab, give the profile a name (e.g., "Proximos Settings").
-4. Click **Application & Custom Settings** in the left payload list.
-5. Click **\+ Add**, then set **Source** to **Upload**.
-6. Click **Choose File** and select your exported `com.enlazo.proximos.settings.plist` file.
-7. Set the **Preference Domain** to `com.enlazo.proximos.settings`.
-8. Go to the **Scope** tab and target the appropriate computers or smart groups.
-9. Click **Save**.
-
-### Deploying the Proximos PPPC Profile
-
-The Full PPPC Profile authorizes Proximos, its bundled notifier, and the Nudge LaunchAgent to function with full system permissions. This profile must be deployed for notifications and enforcement to work correctly.
-
-1. In Proximos, go to **Settings → Extras → Proximos PPPC Profiles → Export Full Profile** and save `Proximos PPPC Profile.mobileconfig`.
-2. In Jamf Pro, go to **Computers → Configuration Profiles → \+ New**.
-3. On the **General** tab, give the profile a name (e.g., "Proximos PPPC Profile").
-4. Click **Upload** (in the upper right of the profile editor) and select the `Proximos PPPC Profile.mobileconfig` file. Jamf Pro will parse and import all payloads from the mobileconfig automatically.
-5. Go to the **Scope** tab and target the appropriate computers or smart groups.
-6. Click **Save**.
-
-### Deploying the System Launch Agent
-
-Deploy the Standard or Headless Launch Agent PKG (generated from **Settings → Extras**) as a Jamf package via a Policy, or upload and run the corresponding deployment script. See [About the System Launch Agent](#about-the-system-launch-agent-and-system-headless-launch-agent) for guidance on which to choose.
-
----
-
-## Deployment in Mosyle
-
-Mosyle supports script-based, package-based, and profile-based deployment for all Proximos components. The recommended approach is the **Installation Script** for the app, a **Custom Profile** for settings, and a **Custom Profile** for the PPPC profile.
-
-### Deploying the Proximos Application
-
-**Option 1 — Custom Command Script (recommended):**
-
-1. In Mosyle, go to the top **Management Tab → macOS → Custom Commands → click "Add new profile" button**.
-2. Profile Name: "Install Proximos Application"
-3. Paste the contents of `Install or Update Proximos.sh` into the Code tab body.
-4. Select the Execution Settings Tab\
-   Event - Every "Device Info" Update\
-   Schedule - Only once (Event Required)
-5. Profile Assignment\
-   Choose to assign to "All current and future Devices", a device group, or individual devices.
-6. Click the Save button
-
-**Option 2 — PKG Deployment:**\
-_Your Mosyle will need to have a paid tier for CDN features to upload a PKG without cloud hosting the pkg file yourself_
-
-1. Go to **Management Tab → macOS → "Install PKG" in left sidebar (you may need to Activate this Profile Type) → PKGs Tab → Click "Add new package" button.**
-2. **Click "Already Have A .PKG"**
-3. **Choose to Automatically Set App Info and click the Next button**
-4. In the Add PKG area, Click the "Upload or Select File from CDN" button
-5. Click the blue Upload button, then Click Choose a file and select the Proximos PKG file
-6. In the Add PKG area, check the box for "This app is Signed"
-7. In the Add PKG area, Click the big "ADD ENTERPRISE APP" button
-8. Now click the "Profiles" tab while still in the "Install PKG" sidebar profile
-9. Click "Add new profile" button
-10. In the Install Apps area, Installation Source, click the "Click to add an app" button, and choose your Proximos App
-11. Advanced options - click the "Click to Edit" button
-12. Check the box to "Activate this configuration"\
-    For Auto-Install Apps, select "Install all apps after saving this profile"\
-    For Reinstall Apps, choose "Reinstall apps that have been removed"\
-    Click the "Confirm" button
-13. Profile Assignment - Assign to All current and future devices, a device group, or individual devices.
-14. Click **Save**.
-
-### Deploying Proximos Settings
-
-> Mosyle delivers Custom Profiles to `/Library/Managed Preferences/`, providing full Managed Mode protection that a local admin cannot remove.
-
-**Custom Profile:**
-
-1. Export your configured settings from **Settings → Export Settings → Export as .plist…**.
-2. In Mosyle, go to **Management → macOS → Certificates / Custom Profiles → Click "Add new profile" button.**
-3. Click the blue "Select the file" button
-4. Browse and choose to upload your exported `com.enlazo.proximos.settings.plist`
-5. Profile Assignment: Assign to all current and future devices, a device group, or individual devices.
-6. Click the **Save button**.
-
-### Deploying the Proximos PPPC Profile
-
-1. In Proximos, go to **Settings → Extras → Export Full Profile** and save `Proximos PPPC Profile.mobileconfig`.
-2. In Mosyle, go to **Management → macOS → Certificates / Custom Profiles → Click "Add new profile" button.**
-3. Click the blue "Select the file" button
-4. Browse and choose to upload your exported `Proximos PPPC Profile.mobileconfig`file.
-5. Profile Assignment: Assign to all current and future devices, a device group, or individual devices.
-6. Click the **Save button**.
-
-### Deploying the System Launch Agent
-
-Deploy the Standard or Headless Launch Agent PKG via **macOS → Custom Packages**, or run the corresponding deployment script as a Custom Command with **Run As: Root**. See [About the System Launch Agent](#about-the-system-launch-agent-and-system-headless-launch-agent) for guidance.
-
----
-
-## Deployment in Addigy
-
-Addigy supports script and package deployment for the Proximos application and settings, and Custom Profile deployment for the PPPC profile. Addigy does not have a feature for deploying a raw application preference `.plist` directly as a Custom Profile the way Jamf Pro's Application & Custom Settings payload does — for Proximos Settings specifically, the file must be deployed as a PKG or a script instead.
-
-### Deploying the Proximos Application
-
-**Smart Software Deployment:**
-
-1. In Addigy, go to **Catalog → Software → \+ New**.
-2. Copy and paste the contents of `Install or Update Proximos.sh` into the **Installation Command** area.
-3. Click **Save**.
-4. Assign the software item to the appropriate Policies.
-
-### Deploying Proximos Settings
-
-Because Addigy cannot deploy a raw `.plist` as a Custom Profile, settings must be pushed as a PKG (via a Smart Software item) or as a script run through a Maintenance Item.
-
-**Option 1 — PKG via Smart Software Item (recommended):**
-
-1. In Proximos, export your configured settings from **Settings → Export Settings → Export as .pkg…** to generate `Proximos Settings.pkg`.
-2. In Addigy, go to **Catalog → Smart Software → \+ Add Software Item** and upload `Proximos Settings.pkg`.
-3. Add the uploaded `Proximos Settings.pkg` file to the **Installation Script** area of the Smart Software item.
-4. While configuring the Software item, go to **Options → Conditions for Install**, enable the **"if app"** checkbox, and set the condition so the Proximos application at `/Applications/Utilities/Proximos` is equal to or greater than version `1.0`. This causes the settings file to be redeployed on every policy check-in.
-5. Assign the Smart Software item to the appropriate policies or device groups.
-
-> **Alternative:** Instead of uploading the PKG, you can copy and paste the contents of the included `Deploy Proximos Settings - Managed Mode.sh` script (customized with your settings values) directly into the **Installation Command** field of the same Smart Software item. This method has advantages if you would like to manually edit the Proximos Settings plist file without having to use the Proximos App to export a new PKG.
-
-**Option 2 — Script via Maintenance Item:**
-
-1. Go to **Devices → Scripts → Manage → \+ New** and add `Deploy Proximos Settings.sh` (with your settings values pre-filled) as a script, set to run as root.
-2. Go to **Catalog → Maintenance → \+ Add Maintenance Item** and add your saved script as a step.
-3. Set the Maintenance Item to run on a recurring schedule. Since a settings file deployed via PKG or script lands in `/Library/Preferences/` (not `/Library/Managed Preferences/`), it can be deleted by a local administrator — we recommend running the Maintenance Item on every check-in to ensure the file is always present.
-4. Assign the Maintenance Item to the appropriate policies or device groups.
-
-### Deploying the Proximos PPPC Profile
-
-The PPPC profile is a standard Apple `.mobileconfig`, which Addigy's Custom Profile feature does support directly:
-
-1. In Proximos, go to **Settings → Extras → Export Full Profile** and save `Proximos PPPC Profile.mobileconfig`.
-2. In Addigy, go to **Catalog** → **Device Settings → New → Custom Profile**.
-3. Click **Select .mobileconfig File** and upload the `Proximos PPPC Profile.mobileconfig` file.
-4. Click **Create Profile**.
-5. Assign the Device Setting to the appropriate Policies.
-
-### Deploying the System Launch Agent
-
-Deploy the Standard or Headless Launch Agent PKG via **Catalog → My Software** (or as a Smart Software item), or run the corresponding deployment script via **Devices → Scripts → Manage**, scheduled through a Maintenance Item if you want it redeployed regularly. See [About the System Launch Agent](#about-the-system-launch-agent-and-system-headless-launch-agent) for guidance.
-
----
-
-## Deployment in JumpCloud
-
-JumpCloud's PKG hosting feature only accepts a signed `.pkg` that contains an `.app` bundle. The Proximos Settings PKG and the Launch Agent PKGs do not meet this requirement — they install a plist, not an application — and will fail JumpCloud's validation if uploaded as software packages. For this reason, Proximos deployment in JumpCloud is handled entirely through **Device Management → Commands** for the application, settings, and launch agents, with the PPPC profile deployed separately as a Custom Configuration Profile.
-
-### Deploying the Proximos Application
-
-1. In JumpCloud, go to **Device Management → Commands → \+ Command After Agent Install**.
-2. Set the **Command Type** to **Mac**, and set **Run As** to **root**.
-3. Paste the contents of `Install or Update Proximos.sh` into the command body.
-4. Associate the command with your target **Mac Device Group(s)**.
-5. Click the **Save** button.
-
-### Deploying Proximos Settings
-
-1. In JumpCloud, go to **Device Management → Commands → \+ New Command**.
-2. Set the **Command Type** to **Mac**.
-3. Paste the contents of `Deploy Proximos Settings.sh` (with your settings values pre-filled) into the command body.
-4. Set **Run As** to **root**.
-5. Set **Event** to **Run as Repeating**, set **Command Repeats By** to **Week**, and select your desired day(s).
-6. Associate the command with your target **Mac Device Group(s)**.
-7. Click the **Save** button.
-
-> **Note:** A settings file deployed this way lands in `/Library/Preferences/` and can be deleted by a local administrator. We recommend scheduling this command to run on every check-in to ensure the file is always present.
-
-### Deploying the Proximos PPPC Profile
-
-1. In Proximos, go to **Settings → Extras → Export Full Profile** and save `Proximos PPPC Profile.mobileconfig`.
-2. In JumpCloud, go to **Device Management → Policy Management → \+ New Policy**.
-3. Select **Mac** as the platform, then search for and select **MDM Custom Configuration Profile**.
-4. Upload the `Proximos PPPC Profile.mobileconfig` file.
-5. Assign the policy to your target **Mac Device Group(s)** and activate it.
-
-### Deploying the System Launch Agent
-
-Because the Standard and Headless Launch Agent PKGs do not contain an `.app` bundle, they will fail JumpCloud's PKG validation and cannot be deployed through Software Management. Deploy the corresponding script instead — `Deploy Proximos System Launch Agent.sh` or `Deploy Proximos System Headless Launch Agent.sh` — as a Command, following the same steps as above with **Run As: root**. See [About the System Launch Agent](#about-the-system-launch-agent-and-system-headless-launch-agent) for guidance on choosing between them.
+  <Card title="JumpCloud" icon="computer" href="/proximos/mdm-jumpcloud">
+    Command-based deployment for the app, settings, and launch agents, with Custom Configuration Profile for PPPC.
+  </Card>
+</CardGroup>
 
 ---
 

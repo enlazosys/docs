@@ -1,0 +1,51 @@
+---
+title: "Addigy"
+description: "Deploying Proximos, its settings, PPPC profile, and launch agents via Addigy."
+icon: "computer"
+---
+
+Addigy supports script and package deployment for the Proximos application and settings, and Custom Profile deployment for the PPPC profile. Addigy does not have a feature for deploying a raw application preference `.plist` directly as a Custom Profile the way Jamf Pro's Application & Custom Settings payload does — for Proximos Settings specifically, the file must be deployed as a PKG or a script instead.
+
+## Deploying the Proximos Application
+
+**Smart Software Deployment:**
+
+1. In Addigy, go to **Catalog → Software → \+ New**.
+2. Copy and paste the contents of `Install or Update Proximos.sh` into the **Installation Command** area.
+3. Click **Save**.
+4. Assign the software item to the appropriate Policies.
+
+## Deploying Proximos Settings
+
+Because Addigy cannot deploy a raw `.plist` as a Custom Profile, settings must be pushed as a PKG (via a Smart Software item) or as a script run through a Maintenance Item.
+
+**Option 1 — PKG via Smart Software Item (recommended):**
+
+1. In Proximos, export your configured settings from **Settings → Export Settings → Export as .pkg…** to generate `Proximos Settings.pkg`.
+2. In Addigy, go to **Catalog → Smart Software → \+ Add Software Item** and upload `Proximos Settings.pkg`.
+3. Add the uploaded `Proximos Settings.pkg` file to the **Installation Script** area of the Smart Software item.
+4. While configuring the Software item, go to **Options → Conditions for Install**, enable the **"if app"** checkbox, and set the condition so the Proximos application at `/Applications/Utilities/Proximos` is equal to or greater than version `1.0`. This causes the settings file to be redeployed on every policy check-in.
+5. Assign the Smart Software item to the appropriate policies or device groups.
+
+> **Alternative:** Instead of uploading the PKG, you can copy and paste the contents of the included `Deploy Proximos Settings - Managed Mode.sh` script (customized with your settings values) directly into the **Installation Command** field of the same Smart Software item. This method has advantages if you would like to manually edit the Proximos Settings plist file without having to use the Proximos App to export a new PKG.
+
+**Option 2 — Script via Maintenance Item:**
+
+1. Go to **Devices → Scripts → Manage → \+ New** and add `Deploy Proximos Settings.sh` (with your settings values pre-filled) as a script, set to run as root.
+2. Go to **Catalog → Maintenance → \+ Add Maintenance Item** and add your saved script as a step.
+3. Set the Maintenance Item to run on a recurring schedule. Since a settings file deployed via PKG or script lands in `/Library/Preferences/` (not `/Library/Managed Preferences/`), it can be deleted by a local administrator — we recommend running the Maintenance Item on every check-in to ensure the file is always present.
+4. Assign the Maintenance Item to the appropriate policies or device groups.
+
+## Deploying the Proximos PPPC Profile
+
+The PPPC profile is a standard Apple `.mobileconfig`, which Addigy's Custom Profile feature does support directly:
+
+1. In Proximos, go to **Settings → Extras → Export Full Profile** and save `Proximos PPPC Profile.mobileconfig`.
+2. In Addigy, go to **Catalog** → **Device Settings → New → Custom Profile**.
+3. Click **Select .mobileconfig File** and upload the `Proximos PPPC Profile.mobileconfig` file.
+4. Click **Create Profile**.
+5. Assign the Device Setting to the appropriate Policies.
+
+## Deploying the System Launch Agent
+
+Deploy the Standard or Headless Launch Agent PKG via **Catalog → My Software** (or as a Smart Software item), or run the corresponding deployment script via **Devices → Scripts → Manage**, scheduled through a Maintenance Item if you want it redeployed regularly. See [About the System Launch Agent](/proximos/mdm-deployment#about-the-system-launch-agent-and-system-headless-launch-agent) for guidance.

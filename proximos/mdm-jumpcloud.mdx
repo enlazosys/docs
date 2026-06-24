@@ -1,0 +1,39 @@
+---
+title: "JumpCloud"
+description: "Deploying Proximos, its settings, PPPC profile, and launch agents via JumpCloud."
+icon: "computer"
+---
+
+JumpCloud's PKG hosting feature only accepts a signed `.pkg` that contains an `.app` bundle. The Proximos Settings PKG and the Launch Agent PKGs do not meet this requirement — they install a plist, not an application — and will fail JumpCloud's validation if uploaded as software packages. For this reason, Proximos deployment in JumpCloud is handled entirely through **Device Management → Commands** for the application, settings, and launch agents, with the PPPC profile deployed separately as a Custom Configuration Profile.
+
+## Deploying the Proximos Application
+
+1. In JumpCloud, go to **Device Management → Commands → \+ Command After Agent Install**.
+2. Set the **Command Type** to **Mac**, and set **Run As** to **root**.
+3. Paste the contents of `Install or Update Proximos.sh` into the command body.
+4. Associate the command with your target **Mac Device Group(s)**.
+5. Click the **Save** button.
+
+## Deploying Proximos Settings
+
+1. In JumpCloud, go to **Device Management → Commands → \+ New Command**.
+2. Set the **Command Type** to **Mac**.
+3. Paste the contents of `Deploy Proximos Settings.sh` (with your settings values pre-filled) into the command body.
+4. Set **Run As** to **root**.
+5. Set **Event** to **Run as Repeating**, set **Command Repeats By** to **Week**, and select your desired day(s).
+6. Associate the command with your target **Mac Device Group(s)**.
+7. Click the **Save** button.
+
+> **Note:** A settings file deployed this way lands in `/Library/Preferences/` and can be deleted by a local administrator. We recommend scheduling this command to run on every check-in to ensure the file is always present.
+
+## Deploying the Proximos PPPC Profile
+
+1. In Proximos, go to **Settings → Extras → Export Full Profile** and save `Proximos PPPC Profile.mobileconfig`.
+2. In JumpCloud, go to **Device Management → Policy Management → \+ New Policy**.
+3. Select **Mac** as the platform, then search for and select **MDM Custom Configuration Profile**.
+4. Upload the `Proximos PPPC Profile.mobileconfig` file.
+5. Assign the policy to your target **Mac Device Group(s)** and activate it.
+
+## Deploying the System Launch Agent
+
+Because the Standard and Headless Launch Agent PKGs do not contain an `.app` bundle, they will fail JumpCloud's PKG validation and cannot be deployed through Software Management. Deploy the corresponding script instead — `Deploy Proximos System Launch Agent.sh` or `Deploy Proximos System Headless Launch Agent.sh` — as a Command, following the same steps as above with **Run As: root**. See [About the System Launch Agent](/proximos/mdm-deployment#about-the-system-launch-agent-and-system-headless-launch-agent) for guidance on choosing between them.
