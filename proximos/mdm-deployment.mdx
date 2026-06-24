@@ -1,6 +1,6 @@
 ---
 title: "MDM Deployment"
-description: "Deploying Proximos, its settings, PPPC profile, and launch agents via Jamf Pro, Mosyle, Addigy, and JumpCloud."
+description: "Deploying Proximos, its settings, PPPC profiles, and launch agents via Jamf Pro, Mosyle, Addigy, JumpCloud, and other MDMs."
 icon: "computer"
 ---
 
@@ -32,7 +32,34 @@ Select your MDM platform for step-by-step deployment instructions:
   <Card title="JumpCloud" icon="computer" href="/proximos/mdm-jumpcloud">
     Command-based deployment for the app, settings, and launch agents, with Custom Configuration Profile for PPPC.
   </Card>
+
+  <Card title="Other MDM" icon="computer" href="/proximos/mdm-other">
+    Generic deployment instructions covering all options for any MDM platform — app, settings, PPPC profile, and launch agents.
+  </Card>
 </CardGroup>
+
+---
+
+## About the PPPC Profiles
+
+Two PPPC profiles are available from **Settings → Extras → Proximos PPPC Profiles**. Both are exported as signed `.mobileconfig` files.
+
+### Full PPPC Profile
+
+**Export Full Profile** produces `Proximos PPPC Profile.mobileconfig`. This is the profile to deploy when Proximos is managed via MDM. It contains two payloads:
+
+- A **Service Management (Managed Login Items)** payload (`com.apple.servicemanagement`) that authorizes Proximos, Nudge, and their associated launch agents as managed background services. This payload requires MDM to deploy and cannot be user-installed.
+- A **Notifications** payload (`com.apple.notificationsettings`) that pre-approves notification permissions for Proximos, Nudge, and their notifier components.
+
+Upload the `.mobileconfig` to your MDM as a Custom Configuration Profile and scope it to your managed devices. Most MDMs parse and import all payloads automatically. If your MDM uses a manual profile builder instead, see the [Other MDM](/proximos/mdm-other#pppc-profile-key-reference) page for the individual key values.
+
+### Notifications Only Profile
+
+**Export Notifications Only Profile** produces `Proximos Notifications Profile.mobileconfig`. This profile contains only the **Notifications** payload — it does not include the Service Management payload, so it does not require MDM to deploy.
+
+This profile exists for Macs that are not enrolled in an MDM but still need pre-approved notification permissions for Proximos and Nudge. It can be distributed via AirDrop or a USB thumb drive and double-click installed directly on a Mac by the user or an IT technician without MDM involvement.
+
+**If you have an MDM, deploy the Full PPPC Profile instead.** The Full Profile is a superset of the Notifications Only Profile and covers all required permissions.
 
 ---
 

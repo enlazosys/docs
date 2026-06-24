@@ -1,0 +1,96 @@
+---
+title: "Other MDM"
+description: "Generic deployment instructions for Proximos on any MDM — app, settings, PPPC profile, and launch agents."
+icon: "computer"
+---
+
+This page covers all available Proximos deployment options for MDM platforms not listed individually in this documentation. Every component can be deployed in multiple ways depending on what your MDM supports.
+
+## Deploying the Proximos Application
+
+**Option 1 — Installation Script (recommended):** The `Install or Update Proximos.sh` script from **Settings → Extras → Export MDM Scripts** downloads the latest Proximos DMG directly from Enlazo Systems, mounts it, copies the app to `/Applications/Utilities/`, and unmounts the DMG. It is safe to run on Macs where Proximos is already installed — it will update to the latest version without removing settings. Deploy this script via your MDM's script execution mechanism and target the appropriate devices.
+
+**Option 2 — PKG Deployment:** If your MDM supports package deployment, you can use a standard Proximos `.pkg` installer. Upload the `.pkg` to your MDM's package library and deploy it to your target devices using a policy, workflow, or equivalent mechanism.
+
+> The installation script is generally preferred over the PKG for Proximos because it always pulls the latest version from Enlazo Systems, ensuring your fleet stays current without requiring a new package upload for each Proximos update.
+
+## Deploying Proximos Settings
+
+**Option 1 — Custom Configuration Profile (recommended):** Export your configured settings plist from **Settings → Export Settings → Export as .plist…** and save it as `com.enlazo.proximos.settings.plist`. If your MDM supports custom configuration profiles, upload this file as a Custom Settings or Application & Custom Settings payload with the preference domain set to `com.enlazo.proximos.settings`. This delivers the settings to `/Library/Managed Preferences/`, where local administrators cannot delete them, ensuring Managed Mode is permanent.
+
+**Option 2 — Settings PKG:** From **Settings → Export Settings → Export as .pkg…**, export your configured settings as an installable package. Deploy it through your MDM's package mechanism. Settings installed via PKG are written to `/Library/Preferences/` and can be removed by a local administrator.
+
+**Option 3 — Deployment Script:** The `Deploy Proximos Settings.sh` script from **Settings → Extras → Export MDM Scripts** creates and deploys the settings plist at `/Library/Preferences/com.enlazo.proximos.settings.plist`. Customize the script with your organization's values before deploying. Because the file lands in `/Library/Preferences/`, a local administrator can delete it. Re-run the script on every MDM check-in to ensure it stays present.
+
+> When a settings file exists at `/Library/Managed Preferences/com.enlazo.proximos.settings.plist` or `/Library/Preferences/com.enlazo.proximos.settings.plist`, Proximos enters **Managed Mode**. In Managed Mode, users cannot access the Settings or License Manager windows, and the Quit option is hidden from the menu bar.
+
+## Deploying the PPPC Profile
+
+Two PPPC profiles are available from **Settings → Extras → Proximos PPPC Profiles**.
+
+### Full PPPC Profile (MDM required)
+
+**Export Full Profile** produces `Proximos PPPC Profile.mobileconfig`. This profile contains two payloads:
+
+- A **Service Management (Managed Login Items)** payload (`com.apple.servicemanagement`) that authorizes Proximos, Nudge, and their associated launch agents as managed background services. This payload **requires MDM** to deploy — it cannot be double-click installed by a user.
+- A **Notifications** payload (`com.apple.notificationsettings`) that pre-approves notification permissions for Proximos, Nudge, and their notifier components.
+
+If your MDM supports uploading a `.mobileconfig` file directly, upload `Proximos PPPC Profile.mobileconfig` and deploy it to your target devices. Most MDMs will parse and import all payloads from the file automatically.
+
+If your MDM uses a profile builder rather than direct `.mobileconfig` upload, you will need to recreate the profile manually using the keys documented below.
+
+### Notifications Only Profile (no MDM required)
+
+**Export Notifications Only Profile** produces `Proximos Notifications Profile.mobileconfig`. This profile contains only the **Notifications** payload and does not include the Service Management payload. Because it contains no MDM-required payloads, it can be distributed and installed without an MDM — for example, delivered to a Mac via AirDrop or a USB thumb drive and double-click installed by the user.
+
+Use this profile for Macs that are not enrolled in an MDM but still need pre-approved notification permissions for Proximos and Nudge. If you have an MDM, deploy the Full PPPC Profile instead.
+
+---
+
+## PPPC Profile Key Reference
+
+If your MDM requires building profiles manually, use the payload types and key values below.
+
+### Payload 1: Service Management — Managed Login Items
+
+**Payload Type:** `com.apple.servicemanagement`\
+**Payload Display Name:** Service Management - Managed Login Items\
+**Required:** MDM deployment only
+
+This payload authorizes Proximos, Nudge, and their associated launch agent labels as managed login items. Add each of the following rules to the `Rules` array:
+
+| RuleType | RuleValue | TeamIdentifier |
+| --- | --- | --- |
+| `BundleIdentifier` | `com.github.macadmins.Nudge` | `9GQZ7KUFR6` |
+| `BundleIdentifier` | `com.github.macadmins.Nudge` | `T4SK8ZXCXG` |
+| `TeamIdentifier` | `T4SK8ZXCXG` | _(not applicable)_ |
+| `Label` | `com.github.macadmins.Nudge` | _(not applicable)_ |
+| `Label` | `com.enlazo.proximos` | `F8HC525N59` |
+| `TeamIdentifier` | `F8HC525N59` | _(not applicable)_ |
+
+### Payload 2: Notifications
+
+**Payload Type:** `com.apple.notificationsettings`\
+**Payload Display Name:** Notifications\
+**Required:** Both profiles (Full and Notifications Only)
+
+This payload pre-approves notification permissions for Proximos's notifier components and Nudge. Add each of the following entries to the `NotificationSettings` array:
+
+| BundleIdentifier | AlertType | CriticalAlertEnabled | BadgesEnabled | NotificationsEnabled | SoundsEnabled | ShowInLockScreen | ShowInNotificationCenter |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `com.github.macadmins.Nudge` | `1` (Temporary) | `true` | `true` | `true` | `true` | `true` | `true` |
+| `com.enlazo.proximos.notifier` | `1` (Temporary) | `false` | `true` | `true` | `true` | `true` | `true` |
+| `com.enlazo.proximos.notifier.alert` | `2` (Persistent) | `true` | `true` | `true` | `true` | `true` | `true` |
+| `com.enlazo.proximos.notifier.banner` | `1` (Temporary) | `false` | `true` | `true` | `true` | `true` | `true` |
+
+All entries also set `GroupingType: 2` (by app) and `PreviewType: 0` (always show previews).
+
+---
+
+## Deploying Launch Agents
+
+Proximos includes two system-level launch agents for persistent or scheduled operation. See [About the System Launch Agent](/proximos/mdm-deployment#about-the-system-launch-agent-and-system-headless-launch-agent) for guidance on which to choose.
+
+**Option 1 — PKG Deployment:** Generate the launch agent PKG from **Settings → Extras → System Launch Agents → Export Standard .pkg** (for the persistent menu bar agent) or **Export Headless .pkg** (for the silent daily check agent). Upload the PKG to your MDM and deploy it via your MDM's package mechanism.
+
+**Option 2 — Deployment Script:** The `Deploy Proximos System Launch Agent.sh` and `Deploy Proximos System Headless Launch Agent.sh` scripts from **Settings → Extras → Export MDM Scripts** install the respective launch agents via script. Deploy via your MDM's script execution mechanism. Re-run on every MDM check-in to ensure the launch agent stays present, since a local administrator can delete the plist from `/Library/LaunchAgents/`.

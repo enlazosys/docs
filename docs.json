@@ -71,7 +71,8 @@
                       "proximos/mdm-jamf-pro",
                       "proximos/mdm-mosyle",
                       "proximos/mdm-addigy",
-                      "proximos/mdm-jumpcloud"
+                      "proximos/mdm-jumpcloud",
+                      "proximos/mdm-other"
                     ]
                   },
                   "proximos/removal",
