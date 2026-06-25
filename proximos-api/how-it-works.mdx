@@ -54,10 +54,21 @@ Point releases (e.g., `J293AP:14.7.2`) are stored as individual rows as well, en
 
 ## Best Response Performance
 
-Using a primary key lookup [GET by BoardID:Version](/proximos-api/endpoints/get-boardid-version) will provide the fastest API response times. If possible, extract a Mac Board ID with shell command`ioreg -l | grep board-id `and use it in your API call. 
+Using a primary key lookup [GET by BoardID:Version](/proximos-api/endpoints/get-boardid-version) will provide the fastest API response times. If possible, extract a Mac Board ID with shell command`ioreg -l | grep board-id `and use it in your API call.
 
 ## Board ID coverage
 
-The `J293AP` (M1 MacBook Pro) is used as the canonical representative board for version-only lookups covering macOS 11 through the latest release. If a BoardID is not supplied, then `J293AP`will be used as the primary key lookup. 
+The `J293AP` (M1 MacBook Pro) is used as the canonical representative board for version-only lookups covering macOS 11 through the latest release. If a BoardID is not supplied, then `J293AP`will be used as the primary key lookup.
 
-For PowerPC and Motorola 68k Macs, the Apple model number is used in place of the BoardID.
+For **PowerPC Macs (Mac OS X 10.0–10.5)** and **Classic Mac OS (System 0.97–Mac OS 9.2.2)**, the Apple model number is used as the board ID in place of a hardware board identifier string. These are the same model numbers physically printed on the machines and documented by EveryMac.com — for example:
+
+| Era | Example board IDs |
+| --- | --- |
+| Power Mac G3 / G4 (Mac OS X) | `M5183` (B&W G3 \+ G4 PCI/AGP/Gigabit/DA), `M8493` (QuickSilver), `M8570` (MDD) |
+| Power Mac G5 (Mac OS X) | `A1047` (all standard G5 models), `A1117` / `A1177` (Dual Core / Quad) |
+| iMac G3 (Mac OS X) | `M4984` (233–333 MHz), `M5521` (350–700 MHz slot-loading) |
+| iMac G4 / G5 (Mac OS X) | `M6498`, `A1065`, `A1058`, `A1076` |
+| Classic Mac 68k | `M0001` (Mac 128K), `M5119` (Mac SE/30), `M4150` (Classic II) |
+| Classic Mac PPC | `M1688` (Power Mac 8100), `M3979` (7200–7600 tower \+ Beige G3 Desktop) |
+
+Where Apple assigned a single model number to multiple machines (common practice), the database entry covers the **union of their compatible OS versions**.

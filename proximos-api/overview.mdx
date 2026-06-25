@@ -26,17 +26,23 @@ https://proximosapi.enlazosystems.com
 
 ## Coverage
 
-<CardGroup cols={2}>
-  <Card title="Classic Mac OS" icon="desktop">
-    **System 0.97 – Mac OS 9.2.2**
+<CardGroup cols={3}>
+  <Card title="Modern macOS" icon="apple">
+    **macOS 11 Big Sur – macOS 26**
 
-    Board IDs are returned as processor model names: `68000`, `68020`, `68030`, `68040`,`601`,`603` ,`603e`,`604` ,`604e`,`G3` ,`G4 `,`G5`
+    Board IDs are Apple's internal hardware identifiers returned directly by the machine. Apple Silicon examples: `J293AP` (M1 MacBook Pro), `J413AP` (M2 MacBook Air). Intel examples: `Mac-35C5E08120C7EEAF`, `Mac-4B682C642B45593E`. Virtual machines: `VMA2MACOSAP`, `VMM-x86_64`.
   </Card>
 
-  <Card title="Mac OS X & macOS" icon="apple">
-    **Mac OS X 10.0 – latest macOS**
+  <Card title="Legacy Mac OS X" icon="display">
+    **Mac OS X 10.0 Cheetah – OS X 10.15 Catalina**
 
-    PowerPC Macs (10.0–10.5) return `PowerPC` as the board ID. Intel and Apple Silicon Macs return Apple's internal board ID strings (e.g. `J293AP`).
+    Intel Macs (10.6–10.15) use Apple's internal board ID strings (e.g. `Mac-F4208EAA`, `Mac-35C5E08120C7EEAF`). PowerPC Macs (10.0–10.5) use Apple model numbers — the same identifiers printed on the machine. Examples: `M5183` (Power Mac G3 B&W \+ G4 PCI/AGP/Gigabit/DA), `A1047` (Power Mac G5), `M6498` (iMac G4), `A1103` (Mac mini G4).
+  </Card>
+
+  <Card title="Classic Mac OS & System" icon="desktop">
+    **System 0.97 – Mac OS 9.2.2**
+
+    Board IDs are the Apple model number physically printed on the machine, verified against EveryMac.com. Examples: `M0001` (Mac 128K), `M5521` (iMac G3 350–700 MHz), `M7777` (all PowerBook Duo models), `M1688` (Power Mac 8100). Where Apple assigned one model number to multiple machines, the union OS range applies.
   </Card>
 </CardGroup>
 

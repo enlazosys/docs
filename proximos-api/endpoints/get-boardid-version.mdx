@@ -21,14 +21,19 @@ Authorization: YOUR_DECODED_LICENSE_KEY
 ## Path Parameters
 
 <ParamField path="boardID" type="string" required>
-  The Apple internal board identifier for the Mac model.
+  The Apple board identifier for the Mac model.
 
   | Era | Example board IDs |
   | --- | --- |
   | Apple Silicon | `J293AP`, `J413AP`, `J316cAP` |
   | Intel | `Mac-35C5E08120C7EEAF`, `Mac-4B682C642B45593E` |
-  | PowerPC (macOS 10.0–10.5) | `PowerPC` |
-  | Classic Mac OS | `G3`, `G4`, `68040`, `68030`, `68000` |
+  | PowerPC Mac OS X (10.0–10.5) | `M5183`, `A1047`, `M8493`, `M6498`, `A1103` |
+  | Classic Mac OS 68k | `M0001`, `M5119`, `M1476`, `M7777`, `M4300` |
+  | Classic Mac OS PPC | `M1688`, `M3979`, `M5521`, `M4984`, `M8570` |
+
+  <Note>
+    For Motorola 68k and PowerPC Macs, the board ID is the Apple model number physically printed on the machine. These are verified against EveryMac.com.
+  </Note>
 </ParamField>
 
 <ParamField path="version" type="string" required>
