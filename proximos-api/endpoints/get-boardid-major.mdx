@@ -37,41 +37,34 @@ Authorization: YOUR_DECODED_LICENSE_KEY
   | Era | Format | Examples |
   | --- | --- | --- |
   | Modern macOS (11\+) | Single integer | `14`, `15`, `26` |
-  | macOS 10.x | Two-part (`10.Y`) | `10.15`, `10.14` |
-  | Classic Mac OS | Two-part (`X.Y`) | `8.5`, `9.2` |
+  | Legacy Mac OS X | Two-part (`10.Y`) | `10.15`, `10.9`, `10.4` |
+  | Classic Mac OS | Two-part (`X.Y`) | `9.0`, `8.5`, `7.1` |
 </ParamField>
 
 ## Example Requests
 
 <CodeGroup>
 
-```bash cURL
+```bash Modern macOS
 curl -H "Authorization: YOUR_DECODED_LICENSE_KEY" \
   https://proximosapi.enlazosystems.com/items/J293AP:14
 ```
 
-```python Python
-import requests
-
-response = requests.get(
-    "https://proximosapi.enlazosystems.com/items/J293AP:14",
-    headers={"Authorization": "YOUR_DECODED_LICENSE_KEY"}
-)
-print(response.json())
+```bash Legacy Mac OS X
+curl -H "Authorization: YOUR_DECODED_LICENSE_KEY" \
+  https://proximosapi.enlazosystems.com/items/M5183:10.4
 ```
 
-```javascript JavaScript
-const response = await fetch(
-  "https://proximosapi.enlazosystems.com/items/J293AP:14",
-  { headers: { "Authorization": "YOUR_DECODED_LICENSE_KEY" } }
-);
-const data = await response.json();
-console.log(data);
+```bash Classic Mac OS
+curl -H "Authorization: YOUR_DECODED_LICENSE_KEY" \
+  https://proximosapi.enlazosystems.com/items/M5521:9.0
 ```
 
 </CodeGroup>
 
-## Response
+## Responses
+
+### Modern macOS
 
 ```json
 [
@@ -85,10 +78,42 @@ console.log(data);
 ]
 ```
 
+### Legacy Mac OS X
+
+`M5183` covers the Power Mac G3 Blue & White and all G4 PCI/AGP/Gigabit/Digital Audio models. The 867 MHz Digital Audio G4 raises the union max to Mac OS X 10.5.8.
+
+```json
+[
+  {
+    "major_version": "10.4",
+    "board_id_major_version": "M5183:10.4",
+    "releasedDate": "2007-11-14",
+    "version": "10.4.11",
+    "resolved_board_id": "M5183"
+  }
+]
+```
+
+### Classic Mac OS
+
+`M5521` covers all slot-loading iMac G3 models (350–700 MHz). It supports Classic Mac OS 8.6 through Mac OS 9.2.2 and Mac OS X 10.0 through 10.4.
+
+```json
+[
+  {
+    "major_version": 9.0,
+    "board_id_major_version": "M5521:9.0",
+    "releasedDate": "2000-04-04",
+    "version": "9.0.4",
+    "resolved_board_id": "M5521"
+  }
+]
+```
+
 ## Response Fields
 
-<ResponseField name="major_version" type="string">
-  The macOS major version from the request.
+<ResponseField name="major_version" type="string | number">
+  The macOS major version from the request. A string for modern macOS and Legacy Mac OS X; a number for Classic Mac OS.
 </ResponseField>
 
 <ResponseField name="board_id_major_version" type="string">
