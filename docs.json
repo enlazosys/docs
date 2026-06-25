@@ -137,5 +137,8 @@
       "label": "Dashboard",
       "href": "https://dashboard.mintlify.com"
     }
+  },
+  "fonts": {
+    "family": "Space Grotesk"
   }
 }
