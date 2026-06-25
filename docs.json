@@ -1,6 +1,6 @@
 {
   "$schema": "https://mintlify.com/docs.json",
-  "theme": "maple",
+  "theme": "mint",
   "name": "Product Guide",
   "description": "Step-by-step guides for The Proximos Mac App and Proximos API. Maximize your macOS Patching Policy with Proximos and Nudge.",
   "colors": {
