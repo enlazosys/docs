@@ -127,8 +127,8 @@
     ]
   },
   "logo": {
-    "light": "/images/EnlazoLogoModern.png",
-    "dark": "/images/EnlazoLogoModern.png"
+    "light": "/images/EnlazoLogoModernHorizontal.png",
+    "dark": "/images/EnlazoLogoModernHorizontal.png"
   },
   "navbar": {
     "links": [],
