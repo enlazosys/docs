@@ -58,4 +58,6 @@ Using a primary key lookup [GET by BoardID:Version](/proximos-api/endpoints/get-
 
 ## Board ID coverage
 
-The `J293AP` (M1 MacBook Pro) is used as the canonical representative board for version-only lookups covering macOS 11 through the latest release. For older macOS versions, progressively older Mac models are used to fill in coverage. For Classic Mac OS and early Mac OS X, processor type identifiers (`G3`, `G4`, `PowerPC`, `68040`, etc.) serve as the board ID.
+The `J293AP` (M1 MacBook Pro) is used as the canonical representative board for version-only lookups covering macOS 11 through the latest release. If a BoardID is not supplied, then `J293AP`will be used as the primary key lookup. 
+
+For PowerPC and Motorola 68k Macs, the Apple model number is used in place of the BoardID.
