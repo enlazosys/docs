@@ -42,8 +42,8 @@ Authorization: YOUR_DECODED_LICENSE_KEY
   | Era | Format | Examples |
   | --- | --- | --- |
   | Modern macOS | `X.Y.Z` | `14.7.2`, `15.3.1`, `26.5.1` |
-  | macOS 10.x | `10.Y.Z` | `10.15.7`, `10.14.6` |
-  | Classic Mac OS | `X.Y.Z` | `8.5.1`, `9.2.2` |
+  | Legacy Mac OS X | `10.Y.Z` | `10.9.3`, `10.4.9` |
+  | Classic Mac OS | `X.Y.Z` | `9.0.2`, `8.5.1`, `7.1.1` |
 
   <Note>
     Passing a major-only version (e.g. `14`) or a two-part version (e.g. `J293AP:14`) to this endpoint will return a shorter response without the proximo fields. Use [GET /items/](/proximos-api/endpoints/get-boardid-major){boardID}[:](/proximos-api/endpoints/get-boardid-major){majorVersion} for that case.
@@ -54,33 +54,26 @@ Authorization: YOUR_DECODED_LICENSE_KEY
 
 <CodeGroup>
 
-```bash cURL
+```bash Modern macOS
 curl -H "Authorization: YOUR_DECODED_LICENSE_KEY" \
   https://proximosapi.enlazosystems.com/items/J293AP:14.7.2
 ```
 
-```python Python
-import requests
-
-response = requests.get(
-    "https://proximosapi.enlazosystems.com/items/J293AP:14.7.2",
-    headers={"Authorization": "YOUR_DECODED_LICENSE_KEY"}
-)
-print(response.json())
+```bash Legacy Mac OS X
+curl -H "Authorization: YOUR_DECODED_LICENSE_KEY" \
+  https://proximosapi.enlazosystems.com/items/M5183:10.4.9
 ```
 
-```javascript JavaScript
-const response = await fetch(
-  "https://proximosapi.enlazosystems.com/items/J293AP:14.7.2",
-  { headers: { "Authorization": "YOUR_DECODED_LICENSE_KEY" } }
-);
-const data = await response.json();
-console.log(data);
+```bash Classic Mac OS
+curl -H "Authorization: YOUR_DECODED_LICENSE_KEY" \
+  https://proximosapi.enlazosystems.com/items/M5521:9.0.2
 ```
 
 </CodeGroup>
 
-## Response
+## Responses
+
+### Modern macOS
 
 ```json
 [
@@ -98,10 +91,50 @@ console.log(data);
 ]
 ```
 
+### Legacy Mac OS X
+
+`M5183` covers the Power Mac G3 Blue & White and all G4 PCI/AGP/Gigabit/Digital Audio models. Mac OS X 10.4.9 is followed immediately by 10.4.10, with 10.4.11 as the final Tiger release.
+
+```json
+[
+  {
+    "major_version": "10.4",
+    "board_id_major_version": "M5183:10.4",
+    "releasedDate": "2007-11-14",
+    "version": "10.4.11",
+    "resolved_board_id": "M5183",
+    "requested_version": "10.4.9",
+    "requested_releasedDate": "2007-03-13",
+    "requested_version_proximo": "10.4.10",
+    "requested_version_proximo_releasedDate": "2007-06-20"
+  }
+]
+```
+
+### Classic Mac OS
+
+`M5521` covers all slot-loading iMac G3 models (350–700 MHz). Mac OS 9.0.2 is followed by 9.0.3, with 9.0.4 as the final Mac OS 9.0 release.
+
+```json
+[
+  {
+    "major_version": 9.0,
+    "board_id_major_version": "M5521:9.0",
+    "releasedDate": "2000-04-04",
+    "version": "9.0.4",
+    "resolved_board_id": "M5521",
+    "requested_version": "9.0.2",
+    "requested_releasedDate": "2000-03-06",
+    "requested_version_proximo": "9.0.3",
+    "requested_version_proximo_releasedDate": "2000-04-01"
+  }
+]
+```
+
 ## Response Fields
 
-<ResponseField name="major_version" type="string">
-  The major version of macOS for this record.
+<ResponseField name="major_version" type="string | number">
+  The major version of macOS for this record. A string for modern macOS and Legacy Mac OS X; a number for Classic Mac OS.
 </ResponseField>
 
 <ResponseField name="board_id_major_version" type="string">
@@ -148,4 +181,4 @@ The version proximo is the **immediate next release** after the version you quer
 | `requested_version_proximo` | `14.7.3` | The very next release after 14.7.2 |
 | `version` | `14.8.7` | The latest release on the 14.x branch |
 
-This makes it easy to walk a Mac through updates incrementally, one release at a time.
+The same logic applies across all eras. Querying `M5521:9.0.2` returns a proximo of `9.0.3` — the very next Classic Mac OS release — while `version` shows `9.0.4` (the latest on the 9.0.x branch).

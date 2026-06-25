@@ -20,8 +20,8 @@ Authorization: YOUR_DECODED_LICENSE_KEY
   | Era | Format | Examples |
   | --- | --- | --- |
   | Modern macOS (11\+) | Single integer | `14`, `15`, `26` |
-  | macOS 10.x | Two-part (`10.Y`) | `10.15`, `10.14`, `10.9` |
-  | Classic Mac OS | Two-part (`X.Y`) | `8.5`, `9.2`, `7.5` |
+  | Legacy Mac OS X (10.x) | Two-part (`10.Y`) | `10.15`, `10.9`, `10.4` |
+  | Classic Mac OS | Two-part (`X.Y`) | `9.2`, `8.5`, `7.5` |
   | System 0.97 | As-is | `0.97` |
 </ParamField>
 
@@ -34,21 +34,21 @@ curl -H "Authorization: YOUR_DECODED_LICENSE_KEY" \
   https://proximosapi.enlazosystems.com/items/26
 ```
 
-```bash macOS 10.x
+```bash Legacy Mac OS X
 curl -H "Authorization: YOUR_DECODED_LICENSE_KEY" \
-  https://proximosapi.enlazosystems.com/items/10.15
+  https://proximosapi.enlazosystems.com/items/10.9
 ```
 
 ```bash Classic Mac OS
 curl -H "Authorization: YOUR_DECODED_LICENSE_KEY" \
-  https://proximosapi.enlazosystems.com/items/8.5
+  https://proximosapi.enlazosystems.com/items/9.0
 ```
 
 </CodeGroup>
 
 ## Responses
 
-### Modern macOS (11\+)
+### Modern macOS
 
 ```json
 [
@@ -62,7 +62,7 @@ curl -H "Authorization: YOUR_DECODED_LICENSE_KEY" \
 ]
 ```
 
-### Mac OS X PowerPC (10.0–10.5)
+### Legacy Mac OS X
 
 ```json
 [
@@ -76,15 +76,15 @@ curl -H "Authorization: YOUR_DECODED_LICENSE_KEY" \
 ]
 ```
 
-### Classic Mac OS (System 0.97 – Mac OS 9.2.2)
+### Classic Mac OS
 
 ```json
 [
   {
-    "major_version": 8.5,
-    "board_id_major_version": "M5521:8.5",
-    "releasedDate": "1998-11-10",
-    "version": "8.5.1",
+    "major_version": 9.0,
+    "board_id_major_version": "M5521:9.0",
+    "releasedDate": "2000-04-04",
+    "version": "9.0.4",
     "resolved_board_id": "M5521"
   }
 ]
@@ -93,7 +93,7 @@ curl -H "Authorization: YOUR_DECODED_LICENSE_KEY" \
 ## Response Fields
 
 <ResponseField name="major_version" type="string | number">
-  The macOS major version. A string for modern macOS; a number for Classic Mac OS.
+  The macOS major version. A string for modern macOS and Legacy Mac OS X; a number for Classic Mac OS.
 </ResponseField>
 
 <ResponseField name="board_id_major_version" type="string">
@@ -109,15 +109,15 @@ curl -H "Authorization: YOUR_DECODED_LICENSE_KEY" \
 </ResponseField>
 
 <ResponseField name="resolved_board_id" type="string">
-  The board ID used to resolve this record. This is a canonical representative Mac for the era:
+  The board ID used to resolve this record — a canonical representative Mac for the era:
 
   - **Modern macOS (11\+):** `J293AP` (M1 MacBook Pro)
-  - **Mac OS X PowerPC (10.0–10.5):** Apple model number (e.g. `M5183` for Power Mac G3 B&W \+ G4 PCI–DA)
-  - **Mac OS X Intel (10.6–10.15):** Intel board ID (e.g. `Mac-F4208EAA`)
+  - **Legacy Mac OS X PowerPC (10.0–10.5):** Apple model number (e.g. `M5183` for Power Mac G3 B&W \+ G4 PCI–DA)
+  - **Legacy Mac OS X Intel (10.6–10.15):** Intel board ID (e.g. `Mac-F4208EAA`)
   - **Classic Mac OS (System 0.97–Mac OS 9.2.2):** Apple model number (e.g. `M5521` for iMac G3 350–700 MHz, `M7777` for PowerBook Duo, `M1688` for Power Mac 8100)
 </ResponseField>
 
 ## Notes
 
-- Passing a full point release (e.g. `14.7.2`) to this endpoint will still return the **latest** release for that major version, not the specific version you passed. To look up a specific point release, use [GET /items/](/proximos-api/endpoints/get-boardid-version){boardID}[:](/proximos-api/endpoints/get-boardid-version){version}.
+- Passing a full point release (e.g. `14.7.2`) to this endpoint will still return the **latest** release for that major version, not the specific version you passed. To look up a specific point release, use [GET /items/](/proximos-api/endpoints/get-boardid-version){boardID}[:](/proximos-api/endpoints/get-boardid-version){version}. Passing a full point release (e.g. `14.7.2`) to this endpoint will still return the **latest** release for that major version, not the specific version you passed. To look up a specific point release, use [GET /items/](/proximos-api/endpoints/get-boardid-version){boardID}[:](/proximos-api/endpoints/get-boardid-version){version}.
 - The response is always an array containing one item.

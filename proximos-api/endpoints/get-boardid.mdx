@@ -35,38 +35,55 @@ Authorization: YOUR_DECODED_LICENSE_KEY
 
 <CodeGroup>
 
-```bash cURL
+```bash Modern macOS
 curl -H "Authorization: YOUR_DECODED_LICENSE_KEY" \
   https://proximosapi.enlazosystems.com/items/J293AP
 ```
 
-```python Python
-import requests
-
-response = requests.get(
-    "https://proximosapi.enlazosystems.com/items/J293AP",
-    headers={"Authorization": "YOUR_DECODED_LICENSE_KEY"}
-)
-print(response.json())
+```bash Legacy Mac OS X
+curl -H "Authorization: YOUR_DECODED_LICENSE_KEY" \
+  https://proximosapi.enlazosystems.com/items/Mac-F4208EAA
 ```
 
-```javascript JavaScript
-const response = await fetch(
-  "https://proximosapi.enlazosystems.com/items/J293AP",
-  { headers: { "Authorization": "YOUR_DECODED_LICENSE_KEY" } }
-);
-const data = await response.json();
-console.log(data);
+```bash Classic Mac OS
+curl -H "Authorization: YOUR_DECODED_LICENSE_KEY" \
+  https://proximosapi.enlazosystems.com/items/M7777
 ```
 
 </CodeGroup>
 
-## Response
+## Responses
+
+### Modern macOS
+
+`J293AP` is the M1 MacBook Pro (14-inch, 2021). Apple Silicon Macs start at macOS 11 Big Sur.
 
 ```json
 {
   "board_id": "J293AP",
   "supported_macOS": "11.0, 12.0, 13.0, 14.0, 15.0, 26.0"
+}
+```
+
+### Legacy Mac OS X
+
+`Mac-F4208EAA` is an early Intel iMac that shipped with Mac OS X 10.5 Leopard and received updates through OS X 10.11 El Capitan.
+
+```json
+{
+  "board_id": "Mac-F4208EAA",
+  "supported_macOS": "10.5, 10.6, 10.7, 10.8, 10.9, 10.10, 10.11"
+}
+```
+
+### Classic Mac OS
+
+`M7777` is the Apple model number shared by all PowerBook Duo models (210, 230, 250, 270c, 280, and 280c). The union OS range spans System 7.0 through System 7.6.1, as the 68LC040-based Duo 280 and 280c raised the maximum from 7.5.5.
+
+```json
+{
+  "board_id": "M7777",
+  "supported_macOS": "7.0, 7.1, 7.5, 7.6"
 }
 ```
 
@@ -77,9 +94,13 @@ console.log(data);
 </ResponseField>
 
 <ResponseField name="supported_macOS" type="string">
-  A comma-separated, version-sorted list of every macOS major version supported by this board ID.
+  A comma-separated, version-sorted list of every macOS major version supported by this board ID. Results are sourced from both the primary and legacy DynamoDB tables, so a single model number that spans both Classic Mac OS and Mac OS X eras (such as `M5521` for iMac G3) will return versions from both.
 
-  Each version is formatted as `X.0` (e.g. `14.0`, `26.0`) for modern macOS. Classic Mac OS entries are formatted as-is (e.g. `8.5`, `9.2`).
+  Version formatting by era:
+
+  - **Modern macOS:** `X.0` suffix (e.g. `14.0`, `26.0`)
+  - **Legacy Mac OS X:** `10.Y` format (e.g. `10.9`, `10.15`)
+  - **Classic Mac OS:** as-is (e.g. `8.5`, `9.2`, `7.1`)
 </ResponseField>
 
 ## Notes

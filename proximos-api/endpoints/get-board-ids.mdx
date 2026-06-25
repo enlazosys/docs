@@ -19,29 +19,24 @@ Authorization: YOUR_DECODED_LICENSE_KEY
 
   | Input | Behavior |
   | --- | --- |
+  | `26` | Returns board IDs for Modern macOS 26 |
   | `12.3.2` | Returns board IDs for macOS 12 (major is inferred) |
-  | `12` | Same result — major version is used to find all compatible boards |
-  | `10.15.7` | Returns board IDs for macOS 10.15 |
-  | `8.5` | Returns Apple model IDs for Classic Mac OS 8.5 |
+  | `10.9.5` | Returns board IDs for Legacy Mac OS X 10.9 |
+  | `7.1.1` | Returns Apple model IDs for Classic Mac OS 7.1 |
 </ParamField>
 
 ## Example Requests
 
 <CodeGroup>
 
-```bash Specific point release
-curl -H "Authorization: YOUR_DECODED_LICENSE_KEY" \
-  https://proximosapi.enlazosystems.com/items/12.3.2/board_ids
-```
-
-```bash Major version only
+```bash Modern macOS
 curl -H "Authorization: YOUR_DECODED_LICENSE_KEY" \
   https://proximosapi.enlazosystems.com/items/26/board_ids
 ```
 
-```bash macOS 10.x
+```bash Legacy Mac OS X
 curl -H "Authorization: YOUR_DECODED_LICENSE_KEY" \
-  https://proximosapi.enlazosystems.com/items/10.15/board_ids
+  https://proximosapi.enlazosystems.com/items/10.9.5/board_ids
 ```
 
 ```bash Classic Mac OS
@@ -99,7 +94,37 @@ curl -H "Authorization: YOUR_DECODED_LICENSE_KEY" \
 }
 ```
 
+### Legacy Mac OS X
+
+Intel board IDs for 10.9 Mavericks. Results are sourced from both the primary and legacy DynamoDB tables, so PowerPC model numbers (e.g. `M5183`, `M4984`) appear alongside Intel board IDs for versions that span both 68k-era and Intel-era Macs.
+
+```json
+{
+  "macos_version": "10.9.5",
+  "major_version": "10.9",
+  "compatible_board_ids": [
+    "Mac-031AEE4D24BFF0B1",
+    "Mac-189A3D4F975D5FFC",
+    "Mac-27ADBB7B4CEE8E61",
+    "Mac-2BD1B31983FE1663",
+    "Mac-3CBD00234E554E41",
+    "Mac-7DF21CB3ED6977E5",
+    "Mac-7DF2A3B5E5D671ED",
+    "Mac-F221DCC8",
+    "Mac-F2218EA8",
+    "Mac-F22C89C8",
+    "Mac-F4208EAA",
+    "Mac-F42386C8",
+    "...",
+    "VMM-x86_64"
+  ],
+  "count": 31
+}
+```
+
 ### Classic Mac OS
+
+Apple model numbers for System 7.1.x. Every entry is a verified Apple model number from EveryMac.com representing one or more physical Mac models.
 
 ```json
 {
