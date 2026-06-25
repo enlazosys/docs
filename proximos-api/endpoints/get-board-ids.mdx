@@ -44,9 +44,16 @@ curl -H "Authorization: YOUR_DECODED_LICENSE_KEY" \
   https://proximosapi.enlazosystems.com/items/10.15/board_ids
 ```
 
+```bash Classic Mac OS
+curl -H "Authorization: YOUR_DECODED_LICENSE_KEY" \
+  https://proximosapi.enlazosystems.com/items/7.1.1/board_ids
+```
+
 </CodeGroup>
 
-## Response
+## Responses
+
+### Modern macOS
 
 ```json
 {
@@ -92,6 +99,65 @@ curl -H "Authorization: YOUR_DECODED_LICENSE_KEY" \
 }
 ```
 
+### Classic Mac OS
+
+```json
+{
+  "macos_version": "7.1.1",
+  "major_version": "7.1",
+  "compatible_board_ids": [
+    "M0001A",
+    "M0350",
+    "M0360",
+    "M0420",
+    "M1205",
+    "M1206",
+    "M1254",
+    "M1350",
+    "M1420",
+    "M1444",
+    "M1476",
+    "M1506",
+    "M1580",
+    "M1596",
+    "M1600",
+    "M1640",
+    "M1688",
+    "M1700",
+    "M2113",
+    "M2118",
+    "M2391",
+    "M2740",
+    "M3047",
+    "M3076",
+    "M3872",
+    "M4150",
+    "M4200",
+    "M4300",
+    "M4440",
+    "M4550",
+    "M4880",
+    "M5000",
+    "M5010",
+    "M5011",
+    "M5119",
+    "M5120",
+    "M5409",
+    "M5416",
+    "M5525",
+    "M5650",
+    "M5780",
+    "M5840",
+    "M5920",
+    "M7777",
+    "M7940",
+    "M9020",
+    "M9040"
+  ],
+  "count": 47
+}
+```
+
 ## Response Fields
 
 <ResponseField name="macos_version" type="string">
@@ -99,7 +165,7 @@ curl -H "Authorization: YOUR_DECODED_LICENSE_KEY" \
 </ResponseField>
 
 <ResponseField name="major_version" type="string">
-  The inferred major version (e.g. `"12"` from `"12.3.2"`).
+  The inferred major version (e.g. `"7.1"` from `"7.1.1"`, `"12"` from `"12.3.2"`).
 </ResponseField>
 
 <ResponseField name="compatible_board_ids" type="array of strings">
