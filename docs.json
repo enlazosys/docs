@@ -97,8 +97,8 @@
                 "group": "Overview",
                 "icon": "folder",
                 "pages": [
-                  "proximos-api/why",
                   "proximos-api/overview",
+                  "proximos-api/why",
                   "proximos-api/how-it-works",
                   "proximos-api/licensing",
                   "proximos-api/privacy",
