@@ -62,16 +62,30 @@ curl -H "Authorization: YOUR_DECODED_LICENSE_KEY" \
 ]
 ```
 
+### Mac OS X PowerPC (10.0–10.5)
+
+```json
+[
+  {
+    "major_version": "10.4",
+    "board_id_major_version": "M5183:10.4",
+    "releasedDate": "2007-11-14",
+    "version": "10.4.11",
+    "resolved_board_id": "M5183"
+  }
+]
+```
+
 ### Classic Mac OS (System 0.97 – Mac OS 9.2.2)
 
 ```json
 [
   {
     "major_version": 8.5,
-    "board_id_major_version": "G3:8.5",
+    "board_id_major_version": "M5521:8.5",
     "releasedDate": "1998-11-10",
     "version": "8.5.1",
-    "resolved_board_id": "G3"
+    "resolved_board_id": "M5521"
   }
 ]
 ```
@@ -97,10 +111,10 @@ curl -H "Authorization: YOUR_DECODED_LICENSE_KEY" \
 <ResponseField name="resolved_board_id" type="string">
   The board ID used to resolve this record. This is a canonical representative Mac for the era:
 
-  - Modern macOS (11\+): `J293AP` (M1 MacBook Pro)
-  - macOS 10.0–10.5: `PowerPC`
-  - macOS 10.6–10.15: Intel board IDs (e.g. `Mac-F4208EAA`)
-  - Classic Mac OS: processor model (e.g. `G3`, `68040`)
+  - **Modern macOS (11\+):** `J293AP` (M1 MacBook Pro)
+  - **Mac OS X PowerPC (10.0–10.5):** Apple model number (e.g. `M5183` for Power Mac G3 B&W \+ G4 PCI–DA)
+  - **Mac OS X Intel (10.6–10.15):** Intel board ID (e.g. `Mac-F4208EAA`)
+  - **Classic Mac OS (System 0.97–Mac OS 9.2.2):** Apple model number (e.g. `M5521` for iMac G3 350–700 MHz, `M7777` for PowerBook Duo, `M1688` for Power Mac 8100)
 </ResponseField>
 
 ## Notes

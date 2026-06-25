@@ -15,15 +15,20 @@ Authorization: YOUR_DECODED_LICENSE_KEY
 ## Path Parameter
 
 <ParamField path="boardID" type="string" required>
-  The Apple internal board identifier for the Mac model. Must start with a letter and contain no periods or colons.
+  The Apple board identifier for the Mac model. Must start with a letter and contain no periods or colons.
 
   | Era | Example board IDs |
   | --- | --- |
   | Apple Silicon | `J293AP`, `J413AP`, `J316cAP`, `J493AP` |
   | Intel | `Mac-35C5E08120C7EEAF`, `Mac-4B682C642B45593E` |
-  | PowerPC (macOS 10.0–10.5) | `PowerPC` |
-  | Classic Mac OS | `G3`, `G4`, `68040`, `68030`, `68000` |
+  | PowerPC Mac OS X (10.0–10.5) | `M5183`, `A1047`, `M8493`, `M6498`, `A1103` |
+  | Classic Mac OS 68k | `M0001`, `M5119`, `M1476`, `M7777`, `M4300` |
+  | Classic Mac OS PPC | `M1688`, `M3979`, `M5521`, `M4984`, `M8570` |
   | Virtual machines | `VMA2MACOSAP`, `VMM-x86_64` |
+
+  <Note>
+    For Motorola 68k and PowerPC Macs, the board ID is the Apple model number physically printed on the machine (e.g. `M5521` for all iMac G3 350–700 MHz slot-loading models). These are verified against EveryMac.com. Where Apple assigned one model number to multiple machines, the database entry covers the union of their supported OS versions.
+  </Note>
 </ParamField>
 
 ## Example Requests
@@ -86,7 +91,7 @@ console.log(data);
 
 ## Finding Your Mac's Board ID
 
-You can find a Mac's board ID from the command line:
+You can find a modern Intel or Apple Silicon Mac's board ID from the command line:
 
 ```bash
 ioreg -d2 -c IOPlatformExpertDevice | grep board-id
@@ -99,3 +104,5 @@ board_id=$(ioreg -d2 -c IOPlatformExpertDevice | awk -F'"' '/board-id/{print $4}
 curl -H "Authorization: YOUR_DECODED_LICENSE_KEY" \
   "https://proximosapi.enlazosystems.com/items/${board_id}"
 ```
+
+For PowerPC and 68k Macs, the board ID is the Apple model number printed on the underside or back of the machine (e.g. `M5521`, `A1047`).

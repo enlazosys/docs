@@ -22,7 +22,7 @@ Authorization: YOUR_DECODED_LICENSE_KEY
   | `12.3.2` | Returns board IDs for macOS 12 (major is inferred) |
   | `12` | Same result — major version is used to find all compatible boards |
   | `10.15.7` | Returns board IDs for macOS 10.15 |
-  | `8.5` | Returns processor IDs for Classic Mac OS 8.5 |
+  | `8.5` | Returns Apple model IDs for Classic Mac OS 8.5 |
 </ParamField>
 
 ## Example Requests
@@ -103,14 +103,14 @@ curl -H "Authorization: YOUR_DECODED_LICENSE_KEY" \
 </ResponseField>
 
 <ResponseField name="compatible_board_ids" type="array of strings">
-  A sorted list of every board ID (Apple internal hardware identifier) that supports this macOS major version.
+  A sorted list of every board ID (Apple hardware identifier) that supports this macOS major version.
 
   Board ID formats vary by Mac era:
 
-  - **Apple Silicon & Intel (modern)**: `J293AP`, `Mac-35C5E08120C7EEAF`, etc.
-  - **Virtual machines**: `VMA2MACOSAP`, `VMM-x86_64`
-  - **PowerPC Mac OS X**: `PowerPC`
-  - **Classic Mac OS**: processor models (`G3`, `G4`, `68040`, `68030`, `68000`)
+  - **Apple Silicon & Intel (modern):** `J293AP`, `Mac-35C5E08120C7EEAF`, etc.
+  - **Virtual machines:** `VMA2MACOSAP`, `VMM-x86_64`
+  - **PowerPC Mac OS X (10.0–10.5):** Apple model numbers (e.g. `M5183`, `A1047`, `M8493`, `M6498`)
+  - **Classic Mac OS (System 0.97–Mac OS 9.2.2):** Apple model numbers (e.g. `M0001`, `M5521`, `M7777`, `M1688`)
 </ResponseField>
 
 <ResponseField name="count" type="integer">

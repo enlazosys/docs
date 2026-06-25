@@ -30,13 +30,13 @@ https://proximosapi.enlazosystems.com
   <Card title="Classic Mac OS" icon="desktop">
     **System 0.97 – Mac OS 9.2.2**
 
-    Board IDs are returned as processor model names: `68000`, `68020`, `68030`, `68040`,`601`,`603` ,`603e`,`604` ,`604e`,`G3` ,`G4 `,`G5`
+    Board IDs are the Apple model number physically printed on the machine — verified against EveryMac.com. Examples: `M0001` (Mac 128K), `M5521` (iMac G3 350–700 MHz), `M7777` (all PowerBook Duo models), `M1688` (Power Mac 8100). Where Apple assigned one model number to multiple machines, the union OS range applies.
   </Card>
 
   <Card title="Mac OS X & macOS" icon="apple">
     **Mac OS X 10.0 – latest macOS**
 
-    PowerPC Macs (10.0–10.5) return `PowerPC` as the board ID. Intel and Apple Silicon Macs return Apple's internal board ID strings (e.g. `J293AP`).
+    PowerPC Macs (10.0–10.5) now use Apple model numbers as board IDs — the same system as Classic Mac OS. Examples: `M5183` (Power Mac G3 B&W \+ G4 PCI/AGP/Gigabit/DA), `A1047` (Power Mac G5), `M6498` (iMac G4). Intel Macs (10.6–10.15) use internal board ID strings (e.g. `Mac-35C5E08120C7EEAF`). Apple Silicon Macs use board IDs like `J293AP`.
   </Card>
 </CardGroup>
 
