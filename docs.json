@@ -87,6 +87,13 @@
                 ]
               }
             ]
+          },
+          {
+            "tab": "Terms of Service",
+            "pages": [
+              "proximos/terms/eula",
+              "proximos/terms/privacy-policy"
+            ]
           }
         ]
       },
