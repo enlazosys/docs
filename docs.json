@@ -69,7 +69,7 @@
                 "pages": [
                   {
                     "group": "MDM Deployment",
-                    "icon": "computer",
+                    "icon": "screen-share",
                     "pages": [
                       "proximos/mdm-deployment",
                       "proximos/mdm-jamf-pro",

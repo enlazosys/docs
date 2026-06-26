@@ -1,7 +1,6 @@
 ---
 title: "JumpCloud"
 description: "Deploying Proximos, its settings, PPPC profile, and launch agents via JumpCloud."
-icon: "computer"
 ---
 
 JumpCloud's PKG hosting feature only accepts a signed `.pkg` that contains an `.app` bundle. The Proximos Settings PKG and the Launch Agent PKGs do not meet this requirement — they install a plist, not an application — and will fail JumpCloud's validation if uploaded as software packages. For this reason, Proximos deployment in JumpCloud is handled entirely through **Device Management → Commands** for the application, settings, and launch agents, with the PPPC profile deployed separately as a Custom Configuration Profile.
