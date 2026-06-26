@@ -271,8 +271,7 @@ When this happens, Proximos does not crash or silently fail. Instead, it display
 **To recover:**
 
 1. Redeploy a corrected settings plist to the appropriate location (`/Library/Managed Preferences/`, `/Library/Preferences/`, or the user's `~/Library/Preferences/`, depending on your deployment method).
-2. Restart the Proximos application, or restart the Mac, to force Proximos to re-read the corrected file immediately.
-
-If you cannot restart the app or Mac right away, Proximos will also auto-repair on its own: once a corrected plist is in place, the next scheduled daily run time will pick it up automatically and resume normal operation without any manual restart.
+2. Proximos will refresh its settings and automatically heal within 10 minutes of a corrected plist being deployed.
+3. Or, restart the Proximos application to force Proximos to re-read the corrected file immediately.
 
 > **Recommendation:** Always create and export your settings file using the Proximos application itself (**Settings → Export Settings**) rather than hand-editing the XML plist in a text editor. The export process guarantees valid plist syntax and correctly typed values, which avoids this failure mode entirely. See [Export Settings Tab](/proximos/settings-overview#export-settings-tab) for details.
