@@ -8,19 +8,19 @@ icon: "rocket"
 
 <Frame>
   <img
-    src="/images/ProximosMenuBar-Light.png"
     alt="Proximos Menu Bar Dark"
     title="Proximos Menu Bar Dark"
     lightAlt="Proximos Menu Bar Light"
     darkAlt="Proximos Menu Bar Dark"
+    src="/images/ProximosMenuBar-Light.png"
     className="dark:hidden"
   />
   <img
-    src="/images/ProximosMenuBar-Dark.png"
     alt="Proximos Menu Bar Dark"
     title="Proximos Menu Bar Dark"
     lightAlt="Proximos Menu Bar Light"
     darkAlt="Proximos Menu Bar Dark"
+    src="/images/ProximosMenuBar-Dark.png"
     className="hidden dark:block"
   />
 </Frame>
@@ -50,7 +50,7 @@ Enable legacy Apple Automatic Updates in Software Update\
 • Either Individually in the Mac System Settings → Software Update\
 • Or enabled in a deployed [com.apple](http://com.apple).SoftwareUpdate MDM profile.
 
-Enabling Apple Automatic Updates will improve the Proximos user experience. 
+Enabling Apple Automatic Updates will improve the Proximos user experience.
 
 ### About the Application
 
@@ -180,3 +180,51 @@ After successful testing, review and adjust the Proximos settings to match your 
 - **Major Settings** — if you need to enforce a major macOS upgrade
 
 Once configured, export your settings from **Settings → Export Settings** and deploy to other Macs. See [MDM Deployment](/proximos/mdm-deployment) for details.
+
+---
+
+## Menu Bar Icon Reference
+
+The Proximos menu bar icon changes to reflect the current state of the app and the Mac it's running on. Here's what each icon means:
+
+<CardGroup cols={2}>
+  <Card title="Terms of Service / No License" icon="hand-wave">
+    Proximos is launching for the first time. The hand waves on first display, prompting you to agree to the Terms of Service or enter your license key.
+  </Card>
+
+  <Card title="Checking for Updates" icon="arrow-clockwise">
+    Proximos is actively running an update check. The arrow spins while the engine is working — the menu is temporarily disabled during this time.
+  </Card>
+
+  <Card title="macOS is Up to Date" icon="circle-check">
+    The Mac is running the latest required macOS version. A green filled checkmark flashes briefly after a successful check, then settles to the outlined version shown here.
+  </Card>
+
+  <Card title="Enrollment Grace Period" icon="clock">
+    The Mac is within the enrollment grace period. Update enforcement is intentionally suppressed — no notifications or Nudge will be dispatched during this window.
+  </Card>
+
+  <Card title="Update Available" icon="triangle-exclamation">
+    A macOS update is available and enforcement is counting down. A **\+N** badge indicates days past due; a **−N** badge indicates days remaining. No badge is shown when the deadline is today.
+  </Card>
+
+  <Card title="Version Skip Active" icon="forward-step">
+    An administrator has used `--skip-macos-version` to suppress enforcement for the current update version. The neutral icon and absent badge reflect the intentional bypass.
+  </Card>
+
+  <Card title="Software Update Error" icon="triangle-exclamation">
+    `softwareupdate` returned an error or could not locate the required update locally. Nudge enforcement is blocked until the issue resolves. Check Console logs for details.
+  </Card>
+
+  <Card title="Unlicensed" icon="ban">
+    The license key is invalid or the subscription has lapsed. Scheduled checks and engine runs are suspended until a valid license is entered.
+  </Card>
+
+  <Card title="Configuration Error" icon="triangle-exclamation">
+    The Proximos settings plist could not be decoded, or was not found at any expected location. The menu item shows the path of the offending file. Correct the plist and Proximos will recover automatically within 10 minutes.
+  </Card>
+</CardGroup>
+
+<Note>
+  The spinning **arrow.clockwise** icon is used during active checks and is compatible with macOS 13 and later. It is rotated in code rather than relying on SF Symbols 5 animation APIs, which require macOS 15 or later.
+</Note>
