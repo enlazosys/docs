@@ -83,7 +83,8 @@
                   "proximos/settings-overview",
                   "proximos/default-settings-reference",
                   "proximos/command-line-overview",
-                  "proximos/extra-mdm-scripts"
+                  "proximos/extra-mdm-scripts",
+                  "proximos/troubleshooting"
                 ]
               }
             ]

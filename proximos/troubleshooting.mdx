@@ -1,0 +1,48 @@
+---
+title: "Troubleshooting"
+description: "How to use the macOS Console app to capture, read, and share Proximos runtime logs for diagnosing issues."
+icon: "wrench"
+---
+
+When diagnosing issues or errors with Proximos, the best place to start is the built-in **Console** app on your Mac. It provides a live stream of system and application logs, including everything Proximos and the Proximos Notifier write at runtime.
+
+## Opening the Console App
+
+The Console app is located in **Utilities**, inside your Applications folder. You can also find it quickly via Spotlight — press `⌘ Space`, type **Console**, and press Return.
+
+## Capturing Logs
+
+<Steps>
+  <Step title="Start Streaming">
+    Once Console is open, click **Start Streaming** in the toolbar. This begins capturing live log output from the system.
+  </Step>
+  <Step title="Reproduce the Issue">
+    With streaming active, perform the runs or operations in Proximos that you want to diagnose. This ensures the relevant log entries are captured.
+  </Step>
+  <Step title="Filter for Proximos">
+    In the search field in the top-right corner of the Console window, type **Proximos** (without quotes) and press Return.
+  </Step>
+  <Step title="Refine the Filter">
+    In the same search bar, click the dropdown arrow next to the word **Any**, and choose your filter mode:
+
+    - **Equals** — Shows only logs from the Proximos app itself. Use this when troubleshooting core Proximos issues.
+    - **Contains** — Shows logs from Proximos _and_ the Proximos Notifier. Use this when you need a broader view that includes notifier activity.
+  </Step>
+  <Step title="Pause Streaming">
+    Once you've reproduced the issue and captured the relevant activity, click **Pause** in the Console toolbar to stop the stream. This makes it easier to read through the log output without it scrolling further.
+  </Step>
+</Steps>
+
+## Reading the Logs
+
+With streaming paused and the Proximos filter active, scroll through the log entries to identify errors, warnings, or unexpected behavior. Log entries include timestamps, process names, and message text — use these to correlate events with the actions you performed in Proximos.
+
+## Sharing Logs
+
+If you need to share your logs with support or a colleague:
+
+1. In the Console log window, press **⌘ A** to select all visible log entries.
+2. In the top-right corner of the Console window, click the **share arrow** button.
+3. From the share menu, select **Copy**.
+
+The full text of the selected log entries is now on your clipboard, ready to paste into an email, support ticket, or document.
