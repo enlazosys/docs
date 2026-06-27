@@ -12,19 +12,19 @@ The Console app is located in **Utilities**, inside your Applications folder. Yo
 
 <Frame>
   <img
-    src="/images/Console-Light.png"
     alt="Console Dark"
     title="Console Dark"
     lightAlt="Console Light"
     darkAlt="Console Dark"
+    src="/images/Console-Light.png"
     className="dark:hidden"
   />
   <img
-    src="/images/Console-Dark.png"
     alt="Console Dark"
     title="Console Dark"
     lightAlt="Console Light"
     darkAlt="Console Dark"
+    src="/images/Console-Dark.png"
     className="hidden dark:block"
   />
 </Frame>
@@ -65,3 +65,9 @@ If you need to share your logs with support or a colleague:
 3. From the share menu, select **Copy**.
 
 The full text of the selected log entries is now on your clipboard, ready to paste into an email, support ticket, or document.
+
+## MDM Troubleshooting
+
+When Proximos is deployed via MDM and you run any standard Proximos command — such as `--check-for-updates` — the runtime log output is automatically captured and saved in your MDM's **command execution history** for that device.
+
+This means you don't need Console access on the managed Mac itself. Instead, check the script or command run log in your MDM console directly. The output will include the same runtime information that would appear in Console, making it straightforward to diagnose issues with remote Macs without requiring physical access or additional log-collection steps.
