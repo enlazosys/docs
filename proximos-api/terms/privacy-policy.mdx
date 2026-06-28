@@ -1,0 +1,116 @@
+---
+title: "Privacy Policy"
+description: "How Enlazo Systems LLC collects, uses, and protects information in connection with the Proximos API."
+icon: "shield-check"
+---
+
+<Info>
+  **Effective Date:** \[Insert Date\] — Enlazo Systems LLC
+</Info>
+
+## 1. Overview
+
+This Privacy Policy explains how Enlazo Systems LLC (“Company,” “we,” “us”) collects, uses, and protects information in connection with the Proximos API (“Service”). By using the Service, you agree to this Privacy Policy.
+
+## 2. Information We Collect
+
+The Proximos API is designed with minimal data retention. We collect only what is necessary to operate and secure the Service.
+
+### What We Store
+
+The following data is logged each time a request is made to the Service:
+
+- **Request count per license key** — used for fair-use limit enforcement
+- **Queried endpoint and parameters** — logged to AWS CloudWatch for operational monitoring and abuse detection
+
+### What We Do Not Store
+
+We do not collect or retain:
+
+- IP addresses
+- Device identifiers or MAC addresses
+- User-agent strings
+- Mac hardware UUIDs or any device-level identifying information
+- Any personally identifying information beyond your license key
+
+### License Key Storage
+
+Your license key is stored in an Amazon DynamoDB table solely to authorize API requests. It is not used for any other purpose and is not shared with any third party.
+
+### Account Information
+
+In addition to license key data, we store the following account-level information:
+
+- Subscription email address
+- Purchase and billing history
+
+## 3. How We Use Information
+
+We use collected information to:
+
+- Authorize API requests and enforce fair-use limits
+- Monitor Service health and detect abuse
+- Operate and maintain the Service
+- Provide customer support
+
+## 4. Data Storage
+
+- API activity logs are stored in Amazon CloudWatch.
+- License key authorization data is stored in Amazon DynamoDB.
+- Subscription and billing records are stored in secure systems operated by or on behalf of the Company.
+
+## 5. Data Retention
+
+| Data | Retention Period |
+| --- | --- |
+| License key connection data (CloudWatch) | 1 year |
+| Customer record (license, purchase history) | 7 years |
+
+### Requesting Deletion of Your Customer Data
+
+Enlazo Systems LLC is happy to comply with data deletion requests. To request deletion of your customer data, please contact us at [support@enlazosystems.com](mailto:support@enlazosystems.com). We will process your request in accordance with applicable law.
+
+## 6. Data Sharing
+
+We do not:
+
+- Sell personal data
+- Share personal data with third parties for marketing purposes
+
+We may share limited data with service providers strictly for operating the Service, including payment processing and AWS infrastructure services.
+
+## 7. Nature of License Key Data
+
+- Your license key is used solely as a technical identifier to authorize API requests.
+- It is not used to directly identify individuals beyond your account record.
+- We do not attempt to associate API usage with personal identity beyond account-level subscription data.
+
+## 8. Data Security
+
+We implement reasonable technical and organizational measures to protect data from unauthorized access, disclosure, or misuse. All API traffic is encrypted in transit via HTTPS. However, no system can be guaranteed to be completely secure.
+
+## 9. Your Rights
+
+Depending on your jurisdiction, you may have the right to:
+
+- Request access to your data
+- Request deletion of your data
+- Request correction of inaccurate data
+
+To exercise any of these rights, please contact us at [support@enlazosystems.com](mailto:support@enlazosystems.com).
+
+## 10. Children’s Privacy
+
+The Service is intended for developers and enterprise use and is not directed to children.
+
+## 11. Changes to This Policy
+
+We may update this Privacy Policy from time to time. Updates will be posted with a revised effective date.
+
+## 12. Contact
+
+<Card title="Enlazo Systems LLC" icon="envelope" href="mailto:support@enlazosystems.com">
+  PO Box 16161 · 1129 Weaver Dairy Rd Suite T
+
+  [support@enlazosystems.com](mailto:support@enlazosystems.com)
+</Card>
