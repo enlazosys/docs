@@ -56,6 +56,22 @@ Point releases (e.g., `J293AP:14.7.2`) are stored as individual rows as well, en
 
 Using a primary key lookup [GET by BoardID:Version](/proximos-api/endpoints/get-boardid-version) will provide the fastest API response times. If possible, extract a Mac Board ID with shell command`ioreg -l | grep board-id `and use it in your API call.
 
+## What is a BoardID?
+
+A BoardID is Apple's internal identifier for a specific logic board configuration within a Mac model line. Because modern Macs have components like RAM, storage, and processors soldered directly to the logic board, a single model — such as a MacBook Air 13" — can ship with several distinct hardware configurations. A BoardID allows Apple, developers, and system administrators to identify exactly which variant they are working with.
+
+BoardIDs are a developer-facing concept and are not surfaced to end users in typical macOS workflows.
+
+### BoardIDs and the Proximos API
+
+Apple uses BoardIDs — not consumer-facing model numbers — as the key for delivering targeted macOS update packages through its GDMF service. This per-board targeting enables more precise update delivery and reduces the risk of applying incompatible software to the wrong hardware configuration.
+
+Because BoardIDs are what Apple's GDMF service supplies, the Proximos API uses them as the primary lookup key for all queries.
+
+### BoardID References
+
+The most comprehensive publicly available BoardID reference is maintained by [Mr. Macintosh](https://mrmacintosh.com/list-of-mac-boardid-deviceid-model-identifiers-machine-models/), though it was last updated in January 2023.
+
 ## Board ID coverage
 
 The `J293AP` (M1 MacBook Pro) is used as the canonical representative board for version-only lookups covering macOS 11 through the latest release. If a BoardID is not supplied, then `J293AP`will be used as the primary key lookup.
