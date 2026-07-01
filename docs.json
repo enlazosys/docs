@@ -126,8 +126,7 @@
                   "proximos-api/endpoints/get-boardid-major",
                   "proximos-api/endpoints/get-boardid"
                 ],
-                "expanded": true,
-                "openapi": "https://enlazofiles.s3.us-east-1.amazonaws.com/Proximos_API_1.5-openai_collection.json"
+                "expanded": true
               }
             ]
           },
