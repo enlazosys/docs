@@ -1,0 +1,71 @@
+---
+title: "Languages"
+description: "How Proximos localization works, the eight supported languages, and how to set the display language per user."
+icon: "languages"
+---
+
+Proximos is localized into eight global languages, covering both the Settings window used by IT admins and the menu bar used by end users. This means a Mac admin and the end user of that same Mac can each see Proximos in their own preferred language, independent of one another.
+
+| Language | Code |
+| :-- | :-- |
+| English | `en` |
+| German | `de` |
+| Spanish | `es` |
+| French | `fr` |
+| Hebrew | `he` |
+| Japanese | `ja` |
+| Portuguese (Brazil) | `pt-BR` |
+| Chinese (Simplified) | `zh-Hans` |
+
+---
+
+## About These Localizations
+
+The language localizations included with Proximos are performed by AI, and cannot be verified or authenticated by Enlazo Systems. They are provided as a best-effort bonus for our non-English-speaking customers, at no additional cost. Enlazo Systems is a small, primarily English-speaking team, and is largely unable to test or validate translation accuracy across all eight languages.
+
+If you or your users encounter a translation that is far off, confusing, or incorrect, please let [Enlazo Systems support](https://enlazosystems.com) know — we're glad to review and correct it.
+
+---
+
+## How the Display Language Is Chosen
+
+By default, Proximos follows the standard macOS behavior for any localized app: it displays in whichever of its supported languages is highest in the user's **Preferred Languages** list, set in **System Settings → General → Language & Region**. If none of the user's preferred languages are among the eight supported, Proximos falls back to English.
+
+Because this preference is read per logged-in user, the Settings window and the menu bar can independently display in different languages on a shared or multi-user Mac — for example, an IT admin's account set to English and an end user's account set to Japanese.
+
+---
+
+## Setting the Language Per User
+
+The display language can be overridden for Proximos specifically — without changing the Mac's system-wide language — using the `AppleLanguages` key scoped to the Proximos bundle identifier. Run the following as the target user (not as root):
+
+```bash
+defaults write com.enlazo.proximos AppleLanguages '(ja)'
+```
+
+Replace `ja` with the code for the desired language from the table above. For example, to force Proximos into Portuguese (Brazil):
+
+```bash
+defaults write com.enlazo.proximos AppleLanguages '(pt-BR)'
+```
+
+Proximos must be relaunched for the change to take effect. See [Open or Relaunch Proximos.sh](/proximos/extra-mdm-scripts#open-or-relaunch-proximossh) for an MDM-friendly way to do this.
+
+To remove the override and return Proximos to following the user's system-wide language preference:
+
+```bash
+defaults delete com.enlazo.proximos AppleLanguages
+```
+
+---
+
+## Proximos Set Language Script
+
+Proximos also ships with an **Advanced Scripts** command called **Proximos Set Language**, available in the **Proximos MDM Scripts** folder exported from **Settings → Extras → Export MDM Scripts**. This script wraps the `AppleLanguages` override above for the current logged-in user, without requiring you to hand-edit a `defaults` command.
+
+**Use for:**
+
+- Forcing Proximos into English on a non-English Mac — useful when a US-based IT admin needs a consistent, familiar interface while troubleshooting a Mac whose system language is set to something else.
+- Setting Proximos to a specific language for a user or group of users, when it differs from their current system-wide language preference.
+
+See [Extra MDM Scripts](/proximos/extra-mdm-scripts#advanced-scripts) for deployment details.
