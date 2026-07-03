@@ -1,10 +1,10 @@
 ---
 title: "Languages"
-description: "How Proximos localization works, the nine supported languages, and how to set the display language per user."
+description: "How Proximos localization works, the ten supported languages, and how to set the display language per user."
 icon: "languages"
 ---
 
-Proximos is localized into eight global languages, covering both the Settings window used by IT admins and the menu bar used by end users. This means a Mac admin and the end user of that same Mac can each see Proximos in their own preferred language, independent of one another.
+Proximos is localized into ten global languages, covering both the Settings window used by IT admins and the menu bar used by end users. This means a Mac admin and the end user of that same Mac can each see Proximos in their own preferred language, independent of one another.
 
 | Language | Code |
 | :-- | :-- |
@@ -17,14 +17,25 @@ Proximos is localized into eight global languages, covering both the Settings wi
 | Portuguese (Brazil) | `pt-BR` |
 | Chinese (Simplified) | `zh-Hans` |
 | Korean | ko |
+| Hindi | hi |
 
 ---
 
 ## About These Localizations
 
-The language localizations included with Proximos are performed by AI, and cannot be verified or authenticated by Enlazo Systems. They are provided as a best-effort bonus for our non-English-speaking customers, at no additional cost. Enlazo Systems is a small, primarily English-speaking team, and is largely unable to test or validate translation accuracy across all eight languages.
+The language localizations included with Proximos are performed by AI, and cannot be verified or authenticated by Enlazo Systems. They are provided as a best-effort bonus for our non-English-speaking customers, at no additional cost. Enlazo is unable to test or validate translation accuracy across all ten languages.
 
 If you or your users encounter a translation that is far off, confusing, or incorrect, please let [Enlazo Systems support](https://enlazosystems.com) know — we're glad to review and correct it.
+
+---
+
+#### <Icon icon="circle-alert" />
+
+## Implementing Languages for Custom Features Caution
+
+It is unknown what other non-latin languages and special characters or accents may cause with behavior in Proximos' custom notifications and Nudge configurations features. Nudge and Daily Notifications messages are passed through POSIX Unix underpinnings which may cause some some characters to appear as blank text, which can cause operational issues with daily notifications not appearing or functioning properly.
+
+For this reason, Enlazo can only formally support Proximos operation with Custom Notifications and Nudge text workflows in English.
 
 ---
 
