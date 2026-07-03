@@ -92,6 +92,17 @@ Overrides the Proximos display language for the current logged-in user by settin
 
 ---
 
+### Proximos Set Language.sh
+
+Overrides the Proximos display language for the current logged-in user by setting the `AppleLanguages` key scoped to the Proximos bundle identifier, independent of the Mac's system-wide language setting. Proximos ships localized into eight global languages — see [Languages](/proximos/languages) for the full list of supported language codes and details on how localization works.
+
+**Use for:**
+
+- Forcing Proximos into English on a non-English Mac, for a consistent troubleshooting experience.
+- Setting the desired language for your users when it differs from their current system-wide preference.
+
+---
+
 ### Proximos Custom Notifications.sh
 
 Allows full customization of enrollment welcome notifications and daily countdown notification messages, for both minor and major upgrade workflows. Deploy this script to a common location on your Macs and reference it as a **Custom Pending Update Command** in Main Settings, or schedule it via your MDM. See [Custom Daily Notifications](/proximos/settings-overview#custom-daily-notifications) in Branding Settings for deployment guidance.
@@ -179,6 +190,6 @@ These scripts surface Proximos runtime status data in your MDM inventory. Each r
 
 **MDM Configuration:**
 
-- **Jamf Pro:** Settings → Extension Attributes (Script type, echo return value)
-- **Mosyle:** Custom Command with the Custom Attribute checkbox enabled
+- **Jamf Pro:** Settings → Extension Attributes → New (Data Type = String or Integer, Input Type = Script)
+- **Mosyle:** Custom Command with the Custom Attribute checkbox enabled and named
 - **Addigy:** Catalog → Custom Fact
