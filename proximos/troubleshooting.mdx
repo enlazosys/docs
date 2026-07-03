@@ -71,3 +71,25 @@ The full text of the selected log entries is now on your clipboard, ready to pas
 When Proximos is deployed via MDM and you run any standard Proximos command — such as `--check-for-updates` — the runtime log output is automatically captured and saved in your MDM's **command execution history** for that device.
 
 This means you don't need Console access on the managed Mac itself. Instead, check the script or command run log in your MDM console directly. The output will include the same runtime information that would appear in Console, making it straightforward to diagnose issues with remote Macs without requiring physical access or additional log-collection steps.
+
+# General Issues
+
+## Daily or Enrollment Notifications Not Appearing
+
+The macOS notifications daemon is its own system and API within macOS. Notifications must come from a genuine macOS app and be registered as approved. Sometimes, we have seen the notifications daemon takes up to 20 minutes to allow an new Mac app to show notifications. Or, applications won't be able to show notifications until the Mac's next restart, or a restart of the `notifyd` process.
+
+Cause: The user may have initially clicked "No" or ignored the request to approve Proximos Notifier Notifications when the first enrollment or daily notification appeared.
+
+Fix: Ideally apply the Proximos PPPC profile to the Mac, or ask the user to visit their Apple logo → System Settings → Notifications, and allow Notifications for Proximos
+
+Cause: If Proximos was just opened for the first time, the local Mac's notification engine has not yet authorized the app
+
+Fix: In Terminal, perform a`sudo killall notifyd` then try running another "Check for macOS Updates". Or simply restart the Mac and try again.
+
+## Corrupted Plist with Menubar Warning
+
+We always recommend doing a new Export from the Settings → Export Settings area from the Proximos app.
+
+If manually editing syntax in your MDM solution like Jamf Pro, we recommend utilizing a formal Plist editor app such as the fantastic [PlistEditPro](https://www.fatcatsoftware.com/plisteditpro/). PlistEditPro allows you to edit your settings plist with a GUI, then copy the raw XML after editing, which can be pasted into our Custom Scripts or MDM Profiles areas.
+
+Proximos will automatically heal itself within 10 minutes one a correct .plist file is applied.
