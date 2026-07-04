@@ -115,7 +115,8 @@
                   "proximos-api/licensing",
                   "proximos-api/privacy",
                   "proximos-api/authentication"
-                ]
+                ],
+                "expanded": true
               },
               {
                 "group": "API Reference",
