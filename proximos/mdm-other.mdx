@@ -9,7 +9,7 @@ This page covers all available Proximos deployment options for MDM platforms not
 
 **Option 1 — Installation Script (recommended):** The `Install or Update Proximos.sh` script from **Settings → Extras → Export MDM Scripts** downloads the latest Proximos DMG directly from Enlazo Systems, mounts it, copies the app to `/Applications/Utilities/`, and unmounts the DMG. It is safe to run on Macs where Proximos is already installed — it will update to the latest version without removing settings. Deploy this script via your MDM's script execution mechanism and target the appropriate devices.
 
-**Option 2 — PKG Deployment:** If your MDM supports package deployment, you can use a standard Proximos `.pkg` installer. Upload the `.pkg` to your MDM's package library and deploy it to your target devices using a policy, workflow, or equivalent mechanism.
+**Option 2 — PKG Deployment:** If your MDM supports package deployment, you can use a standard [Proximos `.pkg` installer](https://files.enlazosystems.com/Proximos/Proximos.pkg) — this link always hosts the latest version. Upload the `.pkg` to your MDM's package library and deploy it to your target devices using a policy, workflow, or equivalent mechanism.
 
 > The installation script is generally preferred over the PKG for Proximos because it always pulls the latest version from Enlazo Systems, ensuring your fleet stays current without requiring a new package upload for each Proximos update.
 
