@@ -62,7 +62,8 @@
                   "proximos/licensing-overview",
                   "proximos/privacy",
                   "proximos/why-isnt-proximos-free"
-                ]
+                ],
+                "expanded": true
               },
               {
                 "group": "Deployment & Administration",
