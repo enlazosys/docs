@@ -87,7 +87,8 @@
                   "proximos/command-line-overview",
                   "proximos/extra-mdm-scripts",
                   "proximos/troubleshooting"
-                ]
+                ],
+                "expanded": true
               }
             ]
           },

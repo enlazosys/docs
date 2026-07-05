@@ -86,6 +86,10 @@ Cause: If Proximos was just opened for the first time, the local Mac's notificat
 
 Fix: In Terminal, perform a`sudo killall notifyd` then try running another "Check for macOS Updates". Or simply restart the Mac and try again.
 
+Cause: When using custom notifications, a custom special character, accent, or non-latin text character is causing an issue with IBM Notifier.
+
+Fix: If using customized notifications and they are not showing, try setting the custom notification to a simple english "Hello" and see if the notifications appear after. IBM Notifier is known to have trouble with some special characters such as exclamation points, and potentially other accents or non-latin characters.
+
 ## Corrupted Plist with Menubar Warning
 
 We always recommend doing a new Export from the Settings → Export Settings area from the Proximos app.
