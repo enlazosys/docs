@@ -160,5 +160,10 @@
   },
   "fonts": {
     "family": "Space Grotesk"
+  },
+  "integrations": {
+    "ga4": {
+      "measurementId": "G-KRT8M4MHL9"
+    }
   }
 }
