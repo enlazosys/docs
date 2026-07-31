@@ -45,16 +45,6 @@ Proximos is designed to be configured once on an IT admin Mac, then deployed bro
   </Card>
 </CardGroup>
 
-<CardGroup cols={2}>
-  <Card title="Download DMG" icon="download" href="https://files.enlazosystems.com/Proximos/Proximos.dmg">
-    Standard installer for dragging into Applications — this link always hosts the latest version.
-  </Card>
-
-  <Card title="Download PKG" icon="package" href="https://files.enlazosystems.com/Proximos/Proximos.pkg">
-    For MDM deployment or scripted installs — this link always hosts the latest version.
-  </Card>
-</CardGroup>
-
 ### Requirements
 
 - macOS 13.5 or later, on either Apple Silicon (ARM) or Intel Macs
@@ -66,9 +56,7 @@ Proximos is designed to be configured once on an IT admin Mac, then deployed bro
 
 ### Strongly Recommended
 
-Enable legacy Apple Automatic Updates in Software Update\
-• Either Individually in the Mac System Settings → Software Update\
-• Or enabled in a deployed [com.apple](http://com.apple).SoftwareUpdate MDM profile.
+Enable legacy Apple Automatic Updates in Software Update<br />• Either Individually in the Mac System Settings → Software Update<br />• Or enabled in a deployed [com.apple](http://com.apple).SoftwareUpdate MDM profile.
 
 Enabling Apple Automatic Updates will improve the Proximos user experience.
 
@@ -82,7 +70,7 @@ SwiftUI's `MenuBarExtra` and full app sandboxing are both goals under considerat
 
 ### Localization
 
-Proximos is localized into nine global languages: English, German, Spanish, French, Hebrew, Japanese, Portuguese (Brazil), Chinese (Simplified), and Korean. Both the Settings window used by IT admins and the menu bar used by end users are fully localized, covering both sides of the deployment — the admin configuring Proximos and the user seeing it every day. See [Languages](/proximos/languages) for details on how the display language is determined and how to set it per Mac or per user.
+Proximos is localized into ten global languages: English, German, Spanish, French, Hebrew, Japanese, Portuguese (Brazil), Chinese (Simplified), Korean, and Hindi. Both the Settings window used by IT admins and the menu bar used by end users are fully localized, covering both sides of the deployment — the admin configuring Proximos and the user seeing it every day. See [Languages](/proximos/languages) for details on how the display language is determined and how to set it per Mac or per user.
 
 ## Networking
 
@@ -111,7 +99,7 @@ If you deploy a System Launch Agent PKG, Proximos must remain installed at the s
 
 ### Installing from DMG
 
-1. Download the latest [Proximos DMG](https://files.enlazosystems.com/Proximos/Proximos.dmg) — this link always points to the newest version — or use— this link always points to the newest version — or use the link provided in your purchase confirmation email.
+1. Download the latest [Proximos DMG](https://files.enlazosystems.com/Proximos/Proximos.dmg) — this persistent link always points to the newest version — or use— this link always points to the newest version — or use the link provided in your purchase confirmation email.
 2. Open the DMG file by double-clicking it.
 3. In the installer window, drag **Proximos.app** into the **Utilities** folder alias shown. Proximos is designed to live at `/Applications/Utilities/Proximos.app`.
 4. Eject the DMG once the copy is complete.
@@ -131,6 +119,8 @@ You can also browse available plans and purchase directly at [enlazosystems.com]
 
 Upon successful purchase, your license key will be delivered to the email address provided at checkout.
 
+Payment Processing is performed by Stripe with their Managed Payments option.
+
 ---
 
 ## Entering Your License Key
@@ -138,7 +128,7 @@ Upon successful purchase, your license key will be delivered to the email addres
 Once you have your license key:
 
 1. Open Proximos from your menu bar or from `/Applications/Utilities/Proximos.app`.
-2. The **Proximos License Manager** window will be displayed. Paste your license key into the **Proximos License Key** field and click **Save License**.
+2. The **Proximos License Manager** window will be displayed. Copy / Paste your license key from the received e-mail into the **Proximos License Key** field in the Proximos License Manager window, and click **Save License**.
 3. Proximos closes the License Manager and validates your key against the Proximos Engine on the next update check run.
 
 In Standard mode, the License Manager is accessible to the IT admin at any time from the menu bar icon. In Managed Mode, the License Manager is not accessible to the user. With a license key present, the License Manager shows your **License Count** (the number of unique Macs connected in the past 30 days), a **Download Report** button to retrieve a CSV of connected devices, and a **Manage** button that opens the Stripe subscription portal for payment method and billing management.
@@ -156,6 +146,8 @@ The license key is stored Base64-encoded in the Proximos settings plist at one o
 After installation and license entry, verify Proximos is working correctly before wider deployment.
 
 ### Run a Manual Update Check
+
+Note: You likely need to disable the Enrollment Grace Period to test checking for macOS updates, from the Proximos menu bar → Settings, uncheck the Enrollment Grace Period and click Save.
 
 1. Click the Proximos icon in the menu bar.
 2. Select **Check for macOS Updates**.
