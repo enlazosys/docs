@@ -5,13 +5,13 @@ description: "Deploying Proximos, its settings, PPPC profiles, and launch agents
 
 Proximos is built for MDM-managed environments. The recommended deployment flow is:
 
-1. Configure Proximos on an IT admin or test Mac.
-2. Export the settings plist from **Settings → Export Settings → Export as .plist…** (or as a `.pkg`).
+1. Open and configure Proximos standalone on an IT admin or test Mac.
+2. When all settings are configured and ready, Export the settings plist from **Settings → Export Settings → Export as .plist…** (or as a `.pkg`).
 3. Deploy [the app](https://files.enlazosystems.com/Proximos/Proximos.pkg) and settings plist to managed Macs via your MDM.
 4. Deploy the System Launch Agent or System Headless Launch Agent PKG from **Settings → Extras** for persistent or headless operation.
-5. Deploy the Proximos PPPC Profile from **Settings → Extras → Export Full Profile** for full notification and enforcement functionality.
+5. Deploy the Proximos PPPC Profile from **Settings → Extras → Export Full Profile** or the for full notification and enforcement functionality.
 
-When a settings file exists at `/Library/Managed Preferences/com.enlazo.proximos.settings.plist` or `/Library/Preferences/com.enlazo.proximos.settings.plist`, Proximos enters **Managed Mode**. In Managed Mode, users cannot access the Settings or License Manager windows, and the Quit menu option is hidden from the menu bar.
+**Note**: When a settings .plist file is detected at `/Library/Managed Preferences/com.enlazo.proximos.settings.plist` or `/Library/Preferences/com.enlazo.proximos.settings.plist`, Proximos enters **Managed Mode**. In Managed Mode, users cannot access the Settings or License Manager windows, and the Quit menu option is hidden from the menu bar.
 
 Select your MDM platform for step-by-step deployment instructions:
 
@@ -117,8 +117,8 @@ To avoid this conflict entirely, the recommended approach is to choose one metho
 
 If you are transitioning from one approach to the other — for example, moving from user-level to system-level launch agents — Proximos Launch Agent Manager will clean up the user-level agent automatically once the system agent is installed. No manual removal is required.
 
-### A Note on User Tampering
+### Disclaimer on User Tampering
 
-As described above, a non-admin user can delete or disable their own User Launch Agent, and any user with local administrator rights can remove a System Launch Agent, delete the Proximos application, or edit a settings plist directly. Proximos includes the protections described throughout this documentation — Managed Mode, the blocked application list, PPPC profiles, and the conflict resolution behavior above — but no software running on a Mac can fully prevent a user with sufficient privileges from tampering with it.
+As described above, a non-admin user can delete or disable their own User Launch Agent, and any user with local administrator rights can remove a System Launch Agent, delete the Proximos application, or edit a non-managed settings plist directly. Proximos includes the protections described throughout this documentation — Managed Mode, the blocked application list, PPPC profiles, and the conflict resolution behavior above — but no software running on a Mac can fully prevent a user with sufficient privileges from tampering with it.
 
 If an employee deliberately disables, removes, or otherwise tampers with Proximos, its launch agents, or its configuration files to avoid update compliance, this is a personnel and policy matter rather than a software issue, and is outside of Enlazo Systems' control. We recommend organizations treat deliberate tampering with required compliance software the same way they would treat circumventing any other IT security control — typically as a matter for HR or IT policy enforcement.
