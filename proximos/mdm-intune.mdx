@@ -1,0 +1,75 @@
+---
+title: "Intune"
+description: "Deploying Proximos, its settings, PPPC profile, and launch agent via Microsoft Intune."
+---
+
+Intune supports script, PKG/DMG, and custom configuration profile deployment for all Proximos components. Because Intune only supports signed PKG files that contain a `.app` for its native app deployment type, the recommended approach is a **PKG or DMG app deployment** for the app itself, a **Preference File profile** for settings, a **Custom Configuration Profile** for the PPPC profile, and a **Script** for the launch agent.
+
+## Deploying the Proximos Application
+
+**Option A — PKG:**
+
+1. Retrieve the latest [Proximos `.pkg` file](https://files.enlazosystems.com/Proximos/Proximos.pkg) (this link always hosts the latest version).
+2. Go to **Apps → macOS → \+ Create**, then set **App type** to **Other → macOS app (PKG)**.
+3. **Step 1:** Upload `Proximos.pkg`. Optionally change the name or description and add the Proximos logo. Enter the **Publisher** as "Enlazo Systems LLC." Click **Next**.
+4. **Step 2:** Skip the Pre-install and Post-install scripts. Click **Next**.
+5. **Step 3:** Set the **Minimum operating system** to macOS High Sierra 10.13. Click **Next**.
+6. **Step 4:** Set **Ignore App Version** to **Yes**. The **App Bundle ID** should auto-detect as `com.enlazo.proximos`. Click **Next**.
+7. **Step 5:** Under **Assignments**, assign to your devices using your custom groups, users, or devices. Click **Next**.
+8. **Step 6:** Review, then click **\+ Create**.
+
+**Option B — DMG:**
+
+1. Retrieve the latest [Proximos `.dmg` file](https://files.enlazosystems.com/Proximos/Proximos.dmg).
+2. Go to **Apps → macOS → \+ Create**, then set **App type** to **Other → macOS app (DMG)**.
+3. **Step 1:** Upload `Proximos.dmg`. Optionally change the name or description and add the Proximos logo. Enter the **Publisher** as "Enlazo Systems LLC." Click **Next**.
+4. **Step 2:** Skip the Pre-install and Post-install scripts. Click **Next**.
+5. **Step 3:** Set the **Minimum operating system** to macOS High Sierra 10.13. Click **Next**.
+6. **Step 4:** Set **Ignore App Version** to **Yes**. Confirm the **App Bundle ID** is `com.enlazo.proximos` and the **App version** is set to the current version. Click **Next**.
+7. **Step 5:** Under **Assignments**, assign to your devices using your custom groups, users, or devices. Click **Next**.
+8. **Step 6:** Review, then click **\+ Create**.
+
+**Option C — Installation Script:** Wraps a PKG install (or custom install logic) as an Intune shell script.
+
+1. Go to **Devices → macOS → Scripts → Add**.
+2. **Step 1:** Name the script "Proximos App."
+3. **Step 2:** Upload the `Proximos Install or Update.sh` script, found in the **Extras** folder inside [`Proximos.dmg`](https://files.enlazosystems.com/Proximos/Proximos.dmg). Set **Run script as signed-in user** to **No**. Set the **Script frequency** to **Every 1 week** if you want the app to update weekly. Set **Max number of times to retry if script fails** to **3**. Click **Next**.
+4. **Step 3:** Under **Assignments**, assign to your devices using your custom groups, users, or devices. Click **Next**.
+5. **Step 4:** Review, then click **\+ Add**.
+
+## Deploying Proximos Settings
+
+Intune's **Preference File** profile template deploys a settings plist exported directly from the Proximos app.
+
+1. In Proximos, go to **Settings → Export Settings → Export as .plist…** and save `com.enlazo.proximos.settings.plist`.
+2. In Intune, go to **Devices → macOS → Configuration → \+ Create → New policy**.
+3. Set **Platform** to **macOS** and **Profile type** to **Templates → Preference File**. Click **Create**.
+4. **Step 1:** Name the profile "Proximos Settings." Click **Next**.
+5. **Step 2:** Set the **Preference domain name** to `com.enlazo.proximos`. Under **Property list file**, select your exported `Proximos Settings.plist`. Click **Next**.
+6. **Step 3:** Under **Assignments**, assign to your devices using your custom groups, users, or devices. Click **Next**.
+7. **Step 4:** Review, then click **\+ Add**.
+
+## Deploying the Proximos PPPC Profile
+
+Intune supports uploading custom configuration profiles directly, which is how the Full PPPC Profile is deployed.
+
+1. In Proximos, go to **Settings → Extras → Proximos PPPC Profiles → Export Full Profile** and save `Proximos PPPC Profile.mobileconfig` — or retrieve it from the **Extras** folder inside [`Proximos.dmg`](https://files.enlazosystems.com/Proximos/Proximos.dmg).
+2. In Intune, go to **Devices → macOS → Configuration → \+ Create → New policy**.
+3. Set **Platform** to **macOS** and **Profile type** to **Templates → Custom**. Click **Create**.
+4. **Step 1:** Name the profile "Proximos PPPC Profile." Click **Next**.
+5. **Step 2:** Set the **Custom configuration profile name** to "Proximos Settings." Set the **Deployment channel** to **Device channel**. Under **Configuration profile file**, upload the `Proximos Full PPPC.mobileconfig` file from the **Extras** folder inside `Proximos.dmg`. Click **Next**.
+6. **Step 3:** Under **Assignments**, assign to your devices using your custom groups, users, or devices. Click **Next**.
+7. **Step 4:** Review, then click **\+ Add**.
+
+## Deploying the System Launch Agent
+
+Intune only supports signed PKG files that contain a `.app`, so the launch agent must be deployed as a script rather than a package.
+
+1. Retrieve either the `Proximos System (Or Headless) Launch Agent.sh` file from **Extras → Proximos MDM Scripts → Deployment Scripts** inside [`Proximos.dmg`](https://files.enlazosystems.com/Proximos/Proximos.dmg), or export your own from **Settings → Extras** in the Proximos app.
+2. In Intune, go to **Devices → macOS → Scripts → Add**.
+3. **Step 1:** Name the script "Proximos Launch Agent."
+4. **Step 2:** Upload either the **Proximos System** or **Proximos Headless Launch Agent.sh** script. Set **Run script as signed-in user** to **No**. Set the **Script frequency** to **Every 1 day**. Click **Next**.
+5. **Step 3:** Under **Assignments**, assign to your devices using your custom groups, users, or devices. Click **Next**.
+6. **Step 4:** Review, then click **\+ Add**.
+
+See [About the System Launch Agent](/proximos/mdm-deployment#about-the-system-launch-agent-and-system-headless-launch-agent) for guidance on choosing between the standard and headless variants.
