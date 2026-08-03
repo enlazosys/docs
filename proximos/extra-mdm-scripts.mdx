@@ -37,7 +37,7 @@ Creates and deploys the Proximos settings plist at `/Library/Preferences/com.enl
 
 **Use for:** Pushing your IT-configured settings to managed Macs after initial app installation.
 
-> **Recommendation:** When possible, deploy the settings plist as a custom configuration profile into `/Library/Managed Preferences/` instead of using a script or PKG. A file written to `/Library/Preferences/` can be deleted by a local administrator, temporarily removing Managed Mode. Configuration profiles delivered through your MDM to `/Library/Managed Preferences/` are protected from user removal. If your MDM does not support custom configuration profiles and you must use a script or PKG, we recommend re-running the deployment script on every MDM policy check-in to ensure the file is always present.
+> **Recommendation:** When possible, deploy the settings plist as a custom configuration profile into `/Library/Managed Preferences/` instead of using a script or PKG. A file written to `/Library/Preferences/` can be deleted by a local administrator, temporarily removing Managed Mode. Configuration profiles delivered through your MDM to `/Library/Managed Preferences/` are protected from user removal. If your MDM does not support deploying custom  .plist files (Addigy and JumpCloud) meaning you must use a script or PKG to deploy settings, we recommend re-running the deployment script on every MDM policy check-in to ensure the file is always present.
 
 ---
 
@@ -80,17 +80,6 @@ Fully uninstalls Proximos, including the application, all settings plists, runti
 ---
 
 ## Advanced Scripts
-
-### Proximos Set Language.sh
-
-Overrides the Proximos display language for the current logged-in user by setting the `AppleLanguages` key scoped to the Proximos bundle identifier, independent of the Mac's system-wide language setting. Proximos ships localized into eight global languages — see [Languages](/proximos/languages) for the full list of supported language codes and details on how localization works.
-
-**Use for:**
-
-- Forcing Proximos into English on a non-English Mac, for a consistent troubleshooting experience.
-- Setting the desired language for your users when it differs from their current system-wide preference.
-
----
 
 ### Proximos Set Language.sh
 

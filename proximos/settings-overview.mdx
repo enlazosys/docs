@@ -80,7 +80,7 @@ The number of days a new Mac is exempt from update enforcement after its first P
 
 #### Enable Proximos Launch Agent
 
-When enabled, Proximos installs and maintains a user-level launch agent (`com.enlazo.proximos`) that keeps the app running in the menu bar persistently. This checkbox is automatically disabled and locked when a System Launch Agent is detected at `/Library/LaunchAgents/com.enlazo.proximos.plist` — the admin-deployed agent already controls the lifecycle. If both a user-level and system-level launch agent are ever present simultaneously, the Proximos Launch Agent Manager resolves the conflict automatically. See [Launch Agent Conflict Resolution](/proximos/mdm-deployment#launch-agent-conflict-resolution) for details.
+When enabled, Proximos installs and maintains a user-level launch agent (`com.enlazo.proximos`) that keeps the app running in the menu bar persistently. This checkbox is automatically disabled and locked when a System Launch Agent is detected at `/Library/LaunchAgents/com.enlazo.proximos.plist` — the admin-deployed agent already controls the lifecycle. If both a Proximos user-level and IT-deployed system-level launch agent are ever present simultaneously, the internal Proximos Launch Agent Manager resolves the conflict automatically. See [Launch Agent Conflict Resolution](/proximos/mdm-deployment#launch-agent-conflict-resolution) for details.
 
 - **Plist key:** `enableProximosLaunchAgent`
 - **Default:** `false`
@@ -113,7 +113,7 @@ Suppresses all Proximos-generated user notification banners, including enrollmen
 
 #### Disable Nudge Integration
 
-Completely disables Nudge JSON configuration writing and Nudge launch agent creation. When enabled, Proximos will run its update check and countdown logic but will never open Nudge — even past the enforcement deadline. Without Nudge, enforcement depends on a Custom Past Due Command, MDM action, or DDM enforcement.
+Completely disables Nudge JSON configuration writing and Nudge launch agent creation. When enabled, Proximos will run its update check and countdown logic but will never open Nudge — even past the enforcement deadline. Without Nudge, enforcement depends on your own Custom Past Due Command, MDM action, or DDM enforcement.
 
 - **Plist key:** `disableNudgeIntegration`
 - **Default:** `false`
@@ -144,7 +144,7 @@ The Nudge Settings tab controls the configuration of the bundled [Nudge](https:/
 
 For complete Nudge configuration documentation, refer to the official Nudge wiki at [https://github.com/macadmins/nudge/wiki/optionalFeatures](https://github.com/macadmins/nudge/wiki/optionalFeatures).
 
-Proximos includes support for only a selected subset of all the available Nudge settings. If you find a Nudge option you would like integrated into Proximos, please let us know. However, we consider Proximos 1.0 mostly feature locked.
+Proximos includes support for only a selected subset of all the available Nudge settings. If you find a Nudge option you would like integrated into Proximos, please let us know. However, we consider Proximos 1.0 mostly feature locked until 2.0.
 
 The two Nudge settings that require particular attention in Proximos are:
 
@@ -159,7 +159,7 @@ A list of application bundle identifiers that Nudge will **not** block or interr
 
 ### Blocked Application Bundle IDs
 
-A list of application bundle identifiers that Nudge will actively block from launching (or terminate on launch) once enforcement begins, preventing users from working around enforcement.
+A list of application bundle identifiers that Nudge will actively block from launching (via terminating on launch) once enforcement begins, preventing users from working around enforcement.
 
 - **Plist key:** `blockedApplicationBundleIDs`
 - **Default includes:** `com.apple.Terminal`, `com.googlecode.iterm2`, `com.apple.ActivityMonitor`, `com.1password.1password`, `com.lastpass.LastPass`, `com.apple.keychainaccess`, `com.apple.Passwords`
@@ -215,18 +215,17 @@ Branding is more than cosmetic. A countdown notification or Nudge window that ca
 
 ### Custom IBM Notifier Location
 
-An optional path to a custom rebranded IBM Notifier application to replace the bundled notifier used for all user-facing alert dialogs. If a custom path is not set or the file does not exist, Proximos falls back to the bundled notifier. See the [IBM Notifier rebranding guide](https://github.com/IBM/mac-ibm-notifications/wiki/Rebranding-the-application) for details on creating a rebranded build.
+An optional path to a custom rebranded IBM Notifier application to replace the bundled notifier used for all user-facing alert dialogs. If a custom path is not set or the file does not exist, Proximos falls back to the bundled notifier. See the [IBM Notifier rebranding guide](https://github.com/IBM/mac-ibm-notifications/wiki/Rebranding-the-application) for details on rebranding Proximos notifications with your logo.
 
 When deploying a custom IBM Notifier, a matching [custom PPPC notifications profile](https://github.com/IBM/mac-ibm-notifications/blob/main/example%20profiles/IBM%20Notifier%20Notifications.mobileconfig) must also be created and deployed via MDM to authorize the rebranded app to display notifications. The link to this profile template is available in **Settings → Branding Settings**.
 
-> **Note:** A custom rebranded IBM Notifier application does not require signing with an Apple Developer certificate if it is deployed to managed Macs inside a custom `.pkg` via MDM. Enlazo Systems recommends using the `pkgbuild` command line tool or [Jamf Composer](https://www.jamf.com/products/jamf-composer/) to build the installer package for your custom branded IBM Notifier.
+> **Note:** A custom rebranded IBM Notifier application does not require signing with an Apple Developer certificate if it is deployed to managed Macs inside a custom `.pkg` via a genuine MDM such as Jamf Pro, Intune, or Addigy. Enlazo Systems recommends using the `pkgbuild` command line tool or [Jamf Composer](https://www.jamf.com/products/jamf-composer/) to build the installer package for your custom branded IBM Notifier. Some MDM's include PKG building wizards you can utilize.
 
 **Building a custom rebranded IBM Notifier:** Rebranding IBM Notifier means recompiling it from source with your own app icon, notification icon, and display name substituted in for IBM's defaults. This requires Xcode installed on a build Mac, and is otherwise a quick process — most of the effort is in preparing the icon assets themselves (an `.icns` app icon and any notification image assets at the correct sizes) rather than the build step. If your design team already has properly sized icon assets ready to go, the rebuild itself can typically be completed in around 30 minutes by someone comfortable opening a project in Xcode and running a build. If you don't have in-house design or build resources, any contract Mac developer or design freelancer experienced with Xcode can typically perform a rebrand from your icon files in a single short engagement.
 
-> Note: For your branding logo icon, we'd recommend starting with an online PNG to ICNS converter like [Cloud Convert PNG to ICNS](https://cloudconvert.com/png-to-icns) and [Candy Icons Icon Assets Generator](https://www.candyicons.com/free-tools/app-icon-assets-generator) to convert your existing brand logo into a Mac icon format file; in the various different sizes needed for IBM Notifier. You may need to add background transparency to your current logo (like a cutout), which AI or [Photopea](https://photopea.com) can help with.
+> Note: For creating your branded logo icon used in IBM Notifier, we'd recommend starting with an online PNG to ICNS converter like [Cloud Convert PNG to ICNS](https://cloudconvert.com/png-to-icns) and [Candy Icons Icon Assets Generator](https://www.candyicons.com/free-tools/app-icon-assets-generator) to convert your existing brand logo into a Mac icon format file; in the various different sizes needed for XCode IBM Notifier. You may need to add background transparency to your current logo (make it a cutout), which AI or [Photopea](https://photopea.com) can help with.
 
-**Why do I need to build a Custom IBM Notifier?**\
-Apple only allows genuine macOS apps to produce macOS notifications in the top right of the screen. This is to prevent viruses, bots, and malware from generating fake notifications impersonating real apps or serrvices. As a quick workaround to building your own custom IBM Notifier, you can still set the "Custom Notification Icon" Custom Branding setting seen below, which can add a small branding image to the built-in Proximos Notifications. The Proximos Notifications icon will still be the Proximos icon.
+**Why do I need to build a Custom IBM Notifier?**<br />Apple only allows **genuine** macOS apps to **produce macOS notifications** that are shown in the top right of the screen and Noticiation Center. This is to prevent viruses, bots, and malware from generating fake notifications impersonating real apps or services. As a quick workaround to building your own custom IBM Notifier, you can still set the "Custom Notification Icon" Custom Branding setting seen below, which can add a small branding image to the built-in Proximos Notifications. The Proximos Notifications icon will still be the Proximos icon.
 
 - **Plist key:** `customNotiferLocation`
 - **Default:** Bundled notifier at `Proximos.app/Contents/Resources/Proximos Notifier.app`

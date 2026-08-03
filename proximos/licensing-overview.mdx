@@ -137,7 +137,13 @@ A **Manage** button opens the Stripe customer portal in an embedded WebView, whe
 
 ## Automated Tier Upgrade Logic
 
-The Proximos Engine tracks the number of unique Mac UUIDs that check in against each license key over rolling 30-day windows. If your active Mac count exceeds **110% of your current tier's device limit and sustains that level for 30 consecutive days**, your subscription is automatically upgraded to the tier that matches your actual active device count at the next billing cycle.
+**_What is a Mac UUID?_**
+
+Mac UUID's are a string of 32 characters that identify an individual Mac. Mac UUID's are **random** and **non-identifiable** to any individual person, Mac model, or Mac serial number. A UUID simply represents a **Mac that exists**. A Mac will generate a new random UUID if the macOS is reinstalled. It is common practice to license software by Mac UUID.
+
+Example Mac UUID: `12345678-1234-1234-1234-1234567890ab`
+
+The Proximos Engine tracks the number of unique Mac UUIDs that check in against each license key over a rolling 30-day window. If your active Mac UUID count exceeds **110% of your current tier's device limit and sustains that level for 30 consecutive days**, your subscription is automatically upgraded to the tier that matches your actual active device count at the next billing cycle.
 
 **Example:** If you are on the 100-Mac Business Plus Pack ($$74.99/mo) and your fleet grows to 112 Macs — which is more than 10% above the 100-device limit — and stays at or above that number for 30 days, your subscription automatically upgrades to the 250-Mac Business Premium Pack ($$189.99/mo).
 
@@ -160,3 +166,9 @@ Include in your request:
 Downgrades take effect at the next billing cycle following approval.
 
 As a self-service alternative, you can cancel your subscription using the **Manage** button in the License Manager, then sign up for a new subscription at your desired tier. Your previous license key will be reactivated and re-approved automatically. For a re-subscription, the trial period is skipped and payment processing begins immediately.
+
+## Caution: Re-imaging / Reformatting Macs & Licensing
+
+A Mac’s UUID changes when macOS is reinstalled. Because the Proximos Engine maintains a rolling 30-day count of Mac UUIDs, a reformatted Mac may be counted as two devices for up to 30 days.
+
+If your IT team performs a large-scale reimage or redeployment, this may temporarily inflate your license count. If that increase triggers an automatic tier upgrade, it would be reasonable to honor a requested downgrade in this situation.

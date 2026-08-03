@@ -66,7 +66,7 @@ If you need to share your logs with support or a colleague:
 
 The full text of the selected log entries is now on your clipboard, ready to paste into an email, support ticket, or document.
 
-## MDM Troubleshooting
+## MDM Troubleshooting via Policy Logs
 
 When Proximos is deployed via MDM and you run any standard Proximos command — such as `--check-for-updates` — the runtime log output is automatically captured and saved in your MDM's **command execution history** for that device.
 
@@ -96,4 +96,4 @@ We always recommend doing a new Export from the Settings → Export Settings are
 
 If manually editing syntax in your MDM solution like Jamf Pro, we recommend utilizing a formal Plist editor app such as the fantastic [PlistEditPro](https://www.fatcatsoftware.com/plisteditpro/). PlistEditPro allows you to edit your settings plist with a GUI, then copy the raw XML after editing, which can be pasted into our Custom Scripts or MDM Profiles areas.
 
-Proximos will automatically heal itself within 10 minutes once a correct .plist file is applied.
+Proximos will automatically heal itself within five minutes once a correct .plist file is applied.

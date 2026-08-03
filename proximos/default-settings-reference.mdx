@@ -60,9 +60,9 @@ With the grace period enabled, new Macs are given a buffer before enforcement be
 
 One day is the default grace period. This gives a new employee enough time to get through their first day of setup — signing into accounts, configuring their environment, attending onboarding — without being immediately pressured by update enforcement.
 
-One day is deliberately minimal. The grace period is not intended as an extended exemption from updates; it is a brief courtesy window. Most organizations deploying Proximos want enforcement to begin promptly. Adjust this value to match your onboarding timeline — common choices are `7` days for a one-week onboarding buffer or `14` days for organizations with longer equipment setup processes.
+One day is deliberately minimal. The grace period is not intended as an extended exemption from updates; it is a brief courtesy window. Most organizations deploying Proximos want enforcement to begin promptly. Adjust this value to match your onboarding timeline — common choices are `3 to 7` days .
 
-> **Note:** The enrollment date is recorded on the first Proximos run and never resets. The grace period clock starts at first launch, not at MDM enrollment.
+> **Note:** The grace period clock counts from Proximos' first launch, not from MDM enrollment.
 
 ---
 
@@ -139,7 +139,7 @@ No custom command runs when a Mac is past the enforcement deadline by default. L
 
 **Default:** `nil` (uses Proximos Engine endpoints)
 
-No custom engine URL is set. The Proximos Engine at `https://proximosappengine.enlazosystems.com/` is used with automatic fallback to the secondary AWS endpoint. This should only be changed if directed by Enlazo Systems support.
+No custom engine URL is set. This should only be changed if directed by Enlazo Systems support.
 
 ---
 
