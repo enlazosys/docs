@@ -73,11 +73,11 @@
                     "icon": "screen-share",
                     "pages": [
                       "proximos/mdm-deployment",
-                      "proximos/mdm-jamf-pro",
-                      "proximos/mdm-mosyle",
-                      "proximos/mdm-addigy",
-                      "proximos/mdm-jumpcloud",
                       "proximos/mdm-intune",
+                      "proximos/mdm-jamf-pro",
+                      "proximos/mdm-addigy",
+                      "proximos/mdm-mosyle",
+                      "proximos/mdm-jumpcloud",
                       "proximos/mdm-other"
                     ]
                   },
