@@ -35,11 +35,11 @@ If you or your users encounter a translation that is far off, confusing, or inco
 
 #### <Icon icon="circle-alert" />
 
-## Implementing Languages for Custom Features Caution
+## Caution: Potential Issues Implementing Languages for Custom Features 
 
-It is unknown what other non-latin languages and special characters or accents may cause with behavior in Proximos' custom notifications and Nudge configurations features. Nudge and Daily Notifications messages are passed through POSIX Unix underpinnings which may cause some some characters to appear as blank text, which can cause operational issues with daily notifications not appearing or functioning properly.
+It is unknown what other non-latin languages and special characters or accents may cause with behavior in Proximos' custom notifications and Nudge configurations features. Nudge and Daily Notifications messages are passed through POSIX Unix underpinnings, which only accept Unicode character sets. Some characters in other languages may appear as blank text or cause IBM notifier to error, which can cause operational issues with daily notifications not appearing or functioning properly.
 
-For this reason, Enlazo can only formally support Proximos operation with Custom Notifications and Nudge text workflows in English.
+For this reason, Enlazo can only formally support Proximos operation with Custom Notifications and Nudge text workflows in English. If you notice missing characters or notifications are not displaying, please try troubleshooting your custom text in English.
 
 ---
 
